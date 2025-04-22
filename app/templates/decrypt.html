@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>Dekripsi Audio</h2>
+    </div>
+    <div class="card-body">
+        <p class="mb-4">Unggah file audio yang berisi pesan tersembunyi dan masukkan kunci dekripsi untuk mengekstrak pesan asli.</p>
+        
+        <form method="POST" action="{{ url_for('decrypt') }}" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="audio_file" class="form-label">File Audio (WAV)</label>
+                <input class="form-control" type="file" id="audio_file" name="audio_file" accept=".wav" required>
+                <div class="form-text">Unggah file audio WAV yang berisi pesan tersembunyi.</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="key" class="form-label">Kunci Dekripsi</label>
+                <input type="text" class="form-control" id="key" name="key" required minlength="16" maxlength="16">
+                <div class="form-text">Masukkan kunci yang sama persis dengan yang digunakan saat enkripsi (16 karakter).</div>
+            </div>
+            
+            <div class="mb-3">
+                <div class="alert alert-warning">
+                    <strong>Perhatian:</strong> Kunci yang salah tidak akan bisa mendekripsi pesan dengan benar. Pastikan kunci yang dimasukkan tepat.
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Dekripsi Audio</button>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Kembali</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>Hasil Dekripsi</h2>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-success mb-4">
+            <h4 class="alert-heading">Berhasil!</h4>
+            <p>Pesan tersembunyi telah berhasil diekstrak dan didekripsi dari file audio.</p>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Pesan Asli (Plaintext)</h5>
+            </div>
+            <div class="card-body">
+                <div class="border p-3 rounded bg-light mb-3" style="white-space: pre-wrap; word-break: break-word;">{{ decrypted_text }}</div>
+                
+                <button class="btn btn-sm btn-secondary" onclick="copyToClipboard()">
+                    <i class="bi bi-clipboard"></i> Salin ke Clipboard
+                </button>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Informasi Dekripsi</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Kunci Dekripsi:</dt>
+                    <dd class="col-sm-9">{{ key }}</dd>
+                    
+                    {% if timestamp %}
+                    <dt class="col-sm-3">Waktu Dekripsi:</dt>
+                    <dd class="col-sm-9">{{ timestamp }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between">
+            <a href="{{ url_for('decrypt') }}" class="btn btn-primary">Dekripsi File Lain</a>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Kembali ke Beranda</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    const text = document.querySelector('.card-body .border').innerText;
+    navigator.clipboard.writeText(text).then(function() {
+        alert('Pesan berhasil disalin!');
+    }, function(err) {
+        alert('Gagal menyalin pesan: ' + err);
+    });
+}
+</script>
+{% endblock %} 

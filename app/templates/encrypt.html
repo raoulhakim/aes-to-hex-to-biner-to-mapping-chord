@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>Enkripsi Pesan</h2>
+    </div>
+    <div class="card-body">
+        <p class="mb-4">Masukkan pesan yang ingin dienkripsi dan kunci enkripsi. Pesan akan dienkripsi dengan AES dan disembunyikan dalam file audio.</p>
+        
+        <form method="POST" action="{{ url_for('encrypt') }}">
+            <div class="mb-3">
+                <label for="plaintext" class="form-label">Pesan (Plaintext)</label>
+                <textarea class="form-control" id="plaintext" name="plaintext" rows="5" required></textarea>
+                <div class="form-text">Masukkan pesan yang ingin dienkripsi dan disembunyikan.</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="key" class="form-label">Kunci Enkripsi</label>
+                <input type="text" class="form-control" id="key" name="key" required minlength="16" maxlength="16">
+                <div class="form-text">Kunci harus tepat 16 karakter. Ingat baik-baik, kunci yang sama diperlukan untuk dekripsi.</div>
+            </div>
+            
+            <div class="mb-3">
+                <div class="alert alert-info">
+                    <strong>Catatan:</strong> Proses enkripsi dan pembuatan audio mungkin memerlukan waktu beberapa detik hingga menit tergantung panjang pesan.
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Enkripsi & Buat Audio</button>
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Kembali</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 
