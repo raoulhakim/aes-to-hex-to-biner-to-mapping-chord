@@ -20,10 +20,10 @@ chord_to_binary = {v.split("-")[0]: k for k, v in binary_to_chord.items()}
 
 # Definisi pola lagu Mary Had a Little Lamb dengan nada dan ketukan
 mary_had_a_little_lamb = [
-    ("E", 2), ("D", 0.9), ("C", 1.4), ("D", 1.4), ("E", 1.2), ("E", 1.4), ("E", 2.6),
-    ("D", 1.4), ("D", 1.4), ("D", 2.8), ("E", 1.4), ("G", 1.4), ("G", 2.6),
-    ("E", 2), ("D", 0.7), ("C", 1.3), ("D", 1.1), ("E", 1.3), ("E", 1.3), ("E", 1.3),
-    ("C", 1.5), ("D", 1.5), ("D", 1.5), ("E", 1.5), ("D", 1.5), ("C", 2.5)
+    ("E", 1.6), ("D", 0.5), ("C", 1.0), ("D", 1.0), ("E", 1), ("E", 1.0), ("E", 2.2),
+    ("D", 1.0), ("D", 1.0), ("D", 2.4), ("E", 1.0), ("G", 1.0), ("G", 2.2),
+    ("E", 1.6), ("D", 0.5), ("C", 1.0), ("D", 1.0), ("E", 1), ("E", 1.0), ("E", 1.0),
+    ("C", 1.1), ("D", 1.1), ("D", 1.1), ("E", 1.1), ("D", 1.1), ("C", 2.2)
 ]
 
 def pad_text(plaintext):
@@ -111,6 +111,9 @@ def prepare_song_with_binary(binary_string):
         # Reset jika mencapai akhir pola lagu
         if song_repeat_count > 0:
             print(f"\n--- Mengulang pola lagu (ke-{song_repeat_count}) ---")
+            # Tambahkan jeda 2 detik di antara perulangan
+            song_pattern.append(("PAUSE", 4.0, "00"))  # 4.0 durasi = 2 detik (karena 1.0 = 0.5 detik)
+            print("Menambahkan jeda 2 detik...")
         
         # Iterasi melalui setiap nada dalam pola lagu
         for pattern_index, (note, duration) in enumerate(mary_had_a_little_lamb):
@@ -144,8 +147,44 @@ def generate_music_from_prepared_song(song_pattern, chord_dir="Chord"):
     
     print("\n=== Pembuatan File Musik dari Pola Lagu ===")
     
+    # Mencari tahu berapa dimensi audio yang digunakan (untuk memastikan jeda konsisten)
+    channels = 1  # Default ke mono jika tidak ada file chord
+    for note, _, binary in song_pattern:
+        if note != "PAUSE":
+            chord_prefix = note
+            chord_filename = f"{chord_prefix}-PianoChord.wav"
+            chord_path = os.path.join(chord_dir, chord_filename)
+            if os.path.exists(chord_path):
+                try:
+                    rate, audio = wavfile.read(chord_path)
+                    if len(audio.shape) > 1:
+                        channels = audio.shape[1]  # Ambil jumlah kanal (1=mono, 2=stereo)
+                    break
+                except Exception:
+                    pass
+    
     # Iterasi melalui pola lagu
     for i, (note, duration, binary) in enumerate(song_pattern):
+        # Jika ini adalah jeda, tambahkan keheningan
+        if note == "PAUSE":
+            # Tambahkan keheningan sesuai durasi
+            pause_duration = int(sample_rate * 0.5 * duration)  # 0.5 detik per unit durasi
+            
+            # Buat keheningan dengan dimensi yang sama dengan audio
+            if channels > 1:
+                silence = np.zeros((pause_duration, channels), dtype=np.int16)
+            else:
+                silence = np.zeros(pause_duration, dtype=np.int16)
+                
+            audio_segments.append(silence)
+            
+            # Catat posisi untuk metadata
+            note_positions.append(position + len(silence))
+            position += len(silence)
+            
+            print(f"Jeda {i+1}: Durasi {duration * 0.5} detik (silence)")
+            continue
+            
         # Tentukan file chord berdasarkan nada
         chord_prefix = note
         chord_filename = f"{chord_prefix}-PianoChord.wav"
@@ -172,13 +211,17 @@ def generate_music_from_prepared_song(song_pattern, chord_dir="Chord"):
             if len(audio) > beat_duration:
                 adjusted_audio = audio[:beat_duration]
             else:
-                padding = np.zeros(beat_duration - len(audio), dtype=audio.dtype)
+                # Buat padding dengan dimensi yang tepat
+                if len(audio.shape) > 1:  # Stereo
+                    padding = np.zeros((beat_duration - len(audio), audio.shape[1]), dtype=audio.dtype)
+                else:  # Mono
+                    padding = np.zeros(beat_duration - len(audio), dtype=audio.dtype)
                 adjusted_audio = np.concatenate([audio, padding])
-                
-                # Catat posisi untuk metadata
-                note_positions.append(position + len(adjusted_audio))
-                position += len(adjusted_audio)
-                
+            
+            # Catat posisi untuk metadata
+            note_positions.append(position + len(adjusted_audio))
+            position += len(adjusted_audio)
+            
             # Tambahkan ke segmen audio
             audio_segments.append(adjusted_audio)
             
@@ -193,10 +236,16 @@ def generate_music_from_prepared_song(song_pattern, chord_dir="Chord"):
     
     # Gabungkan semua segmen audio
     print("\nMenggabungkan semua segmen audio...")
-    combined_audio = np.concatenate(audio_segments)
-    print(f"Audio gabungan: {len(combined_audio)} sampel")
-    
-    return combined_audio, sample_rate, note_positions
+    try:
+        combined_audio = np.concatenate(audio_segments)
+        print(f"Audio gabungan: {len(combined_audio)} sampel")
+        return combined_audio, sample_rate, note_positions
+    except ValueError as e:
+        print(f"Error saat menggabungkan audio: {e}")
+        print("Informasi dimensi audio segments:")
+        for i, segment in enumerate(audio_segments):
+            print(f"Segment {i}: shape {segment.shape}, type {segment.dtype}")
+        return None, None, None
 
 def add_metadata_to_wav(audio_data, sample_rate, metadata, output_file="output.wav"):
     """Menambahkan metadata ke file WAV."""
