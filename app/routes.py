@@ -3,8 +3,8 @@ from flask import render_template, flash, redirect, url_for, request, send_file
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from app import app
-from app.utils.aes_utils import encrypt_aes, decrypt_aes
-from app.utils.audio_utils import binary_to_audio, extract_binary_from_audio
+from app.utils.encrypt_utils import encrypt_aes, binary_to_audio
+from app.utils.decrypt_utils import decrypt_aes, extract_binary_from_audio
 
 def allowed_file(filename):
     """Memeriksa apakah file yang diunggah diizinkan."""

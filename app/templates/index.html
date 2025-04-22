@@ -2,8 +2,8 @@
 
 {% block content %}
 <div class="jumbotron p-5 bg-light rounded-3 mb-4">
-    <h1 class="display-4">Steganografi Audio dengan Enkripsi AES</h1>
-    <p class="lead">Sembunyikan pesan rahasia dalam file audio dengan aman menggunakan enkripsi AES dan lagu Mary Had a Little Lamb.</p>
+    <h1 class="display-4">Noiseless Steganografi Audio dengan Enkripsi AES</h1>
+    <p class="lead">Sembunyikan pesan rahasia dalam file audio yang digenerate dengan aman menggunakan enkripsi AES dan template lagu "Mary Had a Little Lamb".</p>
     <hr class="my-4">
     <p>Pilih salah satu opsi di bawah untuk memulai:</p>
     <div class="d-flex gap-2">
@@ -19,7 +19,7 @@
                 <h5 class="mb-0">Enkripsi Pesan</h5>
             </div>
             <div class="card-body">
-                <p>Enkripsi pesan teks dan sembunyikan dalam file audio.</p>
+                <p>Enkripsi pesan teks dan sembunyikan dalam file audio yang digenerate.</p>
                 <p>Proses:</p>
                 <ol>
                     <li>Masukkan pesan teks</li>
@@ -37,7 +37,7 @@
                 <h5 class="mb-0">Dekripsi Audio</h5>
             </div>
             <div class="card-body">
-                <p>Ekstrak dan dekripsi pesan tersembunyi dari file audio.</p>
+                <p>Ekstrak dan dekripsi pesan tersembunyi dari file audio yang digenerate.</p>
                 <p>Proses:</p>
                 <ol>
                     <li>Unggah file audio yang berisi pesan</li>
@@ -55,18 +55,18 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">Tentang Steganografi Audio</h5>
+                <h5 class="mb-0">Tentang Noiseless Steganografi Audio</h5>
             </div>
             <div class="card-body">
-                <p>Aplikasi ini menggunakan metode steganografi audio untuk menyembunyikan pesan rahasia dalam file musik. Proses yang digunakan:</p>
+                <p>Aplikasi ini menggunakan metode noiseless steganografi audio untuk menyembunyikan pesan rahasia dalam file musik yang digenerate. Proses yang digunakan:</p>
                 <ol>
                     <li>Pesan dienkripsi menggunakan algoritma AES dengan kunci 16 karakter.</li>
                     <li>Hasil enkripsi dikonversi ke bentuk biner (urutan bit 0 dan 1).</li>
-                    <li>Setiap 2 bit dipetakan ke nada musik dalam lagu Mary Had a Little Lamb.</li>
+                    <li>Setiap 2 bit dipetakan ke nada musik dalam lagu "Mary Had a Little Lamb".</li>
                     <li>File audio dibuat dengan urutan nada musik sesuai pemetaan bit.</li>
                     <li>Metadata pemetaan bit disimpan dalam file audio untuk dekripsi.</li>
                 </ol>
-                <p>Keunggulan metode ini adalah pesan tersembunyi dalam musik yang terdengar alami dan tidak mencurigakan.</p>
+                <p>Keunggulan metode ini adalah pesan tersembunyi dalam musik yang terdengar alami bebas dari noise dan tidak mencurigakan.</p>
             </div>
         </div>
     </div>
