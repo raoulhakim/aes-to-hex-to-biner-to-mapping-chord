@@ -29,12 +29,6 @@ Aplikasi web untuk menyembunyikan pesan rahasia dalam file audio menggunakan tek
 # Clone repository
 git clone https://github.com/raoulhakim/aes-to-hex-to-biner-to-mapping-chord.git
 
-# Siapkan virtual environment
-python -m venv venv
-source venv/bin/activate  # Untuk Linux/Mac
-# atau
-venv\Scripts\activate     # Untuk Windows
-
 # Install dependencies
 pip install -r requirements.txt
 ```
@@ -91,9 +85,4 @@ noiseless-steganografi/
 ## 📊 Batasan
 
 - Panjang pesan optimal: 2000-5000 karakter
-- Ukuran file maksimum: 100MB
-- Kunci enkripsi harus tepat 16 karakter
-
-## 📝 Lisensi
-
-Dibagikan sebagai open source untuk tujuan pendidikan dan non-komersial.
+- Kunci enkripsi harus tepat 16 karakter karena AES-128
