@@ -11,15 +11,17 @@ body {
     margin-top: auto;
 }
 
+.container {
+    max-width: 900px;
+}
+
 .card {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
     margin-bottom: 1.5rem;
 }
 
 .card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-    font-weight: 500;
+    background-color: rgba(0,0,0,0.03);
 }
 
 .jumbotron {
@@ -59,5 +61,52 @@ audio {
     
     .card-body {
         padding: 1rem;
+    }
+}
+
+/* Tabel hasil */
+.table-result {
+    font-size: 0.9rem;
+}
+
+.table-result .code {
+    font-family: monospace;
+    background-color: #f8f9fa;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+}
+
+/* Form elements */
+textarea.form-control {
+    min-height: 120px;
+}
+
+/* Tampilan kunci */
+.key-display {
+    font-family: monospace;
+    letter-spacing: 1px;
+}
+
+/* Progress bar */
+.progress {
+    height: 20px;
+    margin-bottom: 1rem;
+}
+
+/* Logo */
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.app-logo {
+    height: 40px;
+    width: auto;
+}
+
+@media (max-width: 576px) {
+    .app-logo {
+        height: 30px;
     }
 } 
