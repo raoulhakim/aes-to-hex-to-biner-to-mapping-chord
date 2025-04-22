@@ -33,11 +33,17 @@ def pad_text(plaintext):
 
 def encrypt_aes(plaintext, key):
     """Mengenkripsi plaintext menggunakan AES."""
-    # Pastikan panjang kunci 16 karakter
-    if len(key) < 16:
-        key = key.ljust(16)
-    elif len(key) > 16:
-        key = key[:16]
+    # Validasi panjang kunci - harus persis 16 karakter
+    if len(key) != 16:
+        print(f"PERINGATAN: Panjang kunci harus 16 karakter, bukan {len(key)}.")
+        print("Kunci akan disesuaikan otomatis untuk enkripsi ini.")
+        
+        if len(key) < 16:
+            key = key.ljust(16)  # Tambahkan spasi jika terlalu pendek
+            print(f"Kunci diperpanjang: '{key}'")
+        else:
+            key = key[:16]  # Potong jika terlalu panjang
+            print(f"Kunci dipotong: '{key}'")
     
     # Padding plaintext
     padded_text = pad_text(plaintext)
@@ -125,13 +131,6 @@ def prepare_song_with_binary(binary_string):
             print(f"Nada {pattern_index+1}: {note} (Durasi: {duration}) ← Biner: {binary_segment}")
             binary_index += 1
             
-        # Tambahkan jeda 2 detik setelah satu perulangan lagu selesai, kecuali ini perulangan terakhir
-        if binary_index < len(binary_segments):
-            # Gunakan "PAUSE" sebagai penanda jeda dan nilai biner terakhir yang digunakan sebagai placeholder
-            last_binary = binary_segments[binary_index-1] if binary_index > 0 else "00"
-            song_pattern.append(("PAUSE", 4.0, last_binary))  # 4.0 karena 1.0 = 0.5 detik, sehingga 4.0 = 2 detik
-            print(f"Menambahkan jeda 2 detik setelah perulangan ke-{song_repeat_count}")
-            
         song_repeat_count += 1
     
     return song_pattern, binary_mapping, "".join(used_binary)
@@ -142,55 +141,11 @@ def generate_music_from_prepared_song(song_pattern, chord_dir="Chord"):
     audio_segments = []
     note_positions = [0]
     position = 0
-    channels = None  # Untuk menyimpan jumlah channel dari file audio
     
     print("\n=== Pembuatan File Musik dari Pola Lagu ===")
     
-    # Baca salah satu file untuk mendapatkan format (stereo/mono)
-    # Cari file chord pertama yang valid
-    for note, _, binary in song_pattern:
-        if note != "PAUSE":
-            # Coba baca salah satu file
-            try:
-                test_file = os.path.join(chord_dir, f"{note}-PianoChord.wav")
-                if os.path.exists(test_file):
-                    _, test_audio = wavfile.read(test_file)
-                    if len(test_audio.shape) > 1:
-                        channels = test_audio.shape[1]  # Stereo
-                    else:
-                        channels = 1  # Mono
-                    break
-            except Exception:
-                pass
-    
-    # Default ke mono jika tidak ada file yang valid
-    if channels is None:
-        channels = 1
-        
     # Iterasi melalui pola lagu
     for i, (note, duration, binary) in enumerate(song_pattern):
-        # Cek apakah ini jeda
-        if note == "PAUSE":
-            # Buat segmen sunyi untuk jeda dengan dimensi yang sama
-            pause_duration = int(sample_rate * 0.5 * duration)  # Durasi jeda dalam sampel
-            
-            if channels > 1:
-                # Buat silence stereo jika audio adalah stereo
-                silence = np.zeros((pause_duration, channels), dtype=np.int16)
-            else:
-                # Buat silence mono jika audio adalah mono
-                silence = np.zeros(pause_duration, dtype=np.int16)
-            
-            # Catat posisi untuk metadata
-            note_positions.append(position + len(silence))
-            position += len(silence)
-            
-            # Tambahkan ke segmen audio
-            audio_segments.append(silence)
-            
-            print(f"Nada {i+1}: JEDA (Durasi: {duration} = 2 detik)")
-            continue
-            
         # Tentukan file chord berdasarkan nada
         chord_prefix = note
         chord_filename = f"{chord_prefix}-PianoChord.wav"
@@ -210,10 +165,6 @@ def generate_music_from_prepared_song(song_pattern, chord_dir="Chord"):
             # Baca file chord
             rate, audio = wavfile.read(chord_path)
             
-            # Simpan informasi channel untuk segmen jeda
-            if channels is None and len(audio.shape) > 1:
-                channels = audio.shape[1]
-            
             # Hitung durasi berdasarkan ketukan (1.0 = 0.5 detik)
             beat_duration = int(sample_rate * 0.5 * duration)
             
@@ -221,21 +172,17 @@ def generate_music_from_prepared_song(song_pattern, chord_dir="Chord"):
             if len(audio) > beat_duration:
                 adjusted_audio = audio[:beat_duration]
             else:
-                    # Sesuaikan padding dengan dimensi audio
-                if len(audio.shape) > 1:  # Stereo
-                    padding = np.zeros((beat_duration - len(audio), audio.shape[1]), dtype=audio.dtype)
-                else:  # Mono
-                    padding = np.zeros(beat_duration - len(audio), dtype=audio.dtype)
-                    adjusted_audio = np.concatenate([audio, padding])
+                padding = np.zeros(beat_duration - len(audio), dtype=audio.dtype)
+                adjusted_audio = np.concatenate([audio, padding])
                 
                 # Catat posisi untuk metadata
                 note_positions.append(position + len(adjusted_audio))
                 position += len(adjusted_audio)
                 
-                # Tambahkan ke segmen audio
-                audio_segments.append(adjusted_audio)
-                
-                print(f"Nada {i+1}: {note} (Durasi: {duration}, Biner: {binary}) → {chord_filename}")
+            # Tambahkan ke segmen audio
+            audio_segments.append(adjusted_audio)
+            
+            print(f"Nada {i+1}: {note} (Durasi: {duration}, Biner: {binary}) → {chord_filename}")
             
         except Exception as e:
             print(f"Error saat membaca {chord_path}: {e}")
@@ -255,6 +202,9 @@ def add_metadata_to_wav(audio_data, sample_rate, metadata, output_file="output.w
     """Menambahkan metadata ke file WAV."""
     # Simpan audio dalam format WAV
     wavfile.write(output_file, sample_rate, audio_data)
+    
+    print("\n=== Debug Metadata ===")
+    print(f"Metadata yang akan disimpan: {json.dumps(metadata, indent=2)}")
     
     # Simpan metadata dalam format JSON
     metadata_json = json.dumps(metadata).encode('utf-8')
@@ -280,6 +230,8 @@ def add_metadata_to_wav(audio_data, sample_rate, metadata, output_file="output.w
         wf.setparams((n_channels, sampwidth, framerate, n_frames, comp_type, comp_name))
         wf.writeframes(frames_with_meta)
     
+    print(f"Metadata berhasil ditambahkan, ukuran metadata: {len(metadata_json)} bytes")
+    
     return output_file
 
 def main():
@@ -290,14 +242,14 @@ def main():
     plaintext = input("Masukkan teks (plaintext): ")
     
     # Input kunci enkripsi
-    key = input("Masukkan kunci enkripsi (16 karakter): ")
+    key = input("Masukkan kunci enkripsi (harus persis 16 karakter): ")
     
     # Enkripsi plaintext menggunakan AES
     ciphertext_hex = encrypt_aes(plaintext, key)
     print(f"Hasil enkripsi AES (hex): {ciphertext_hex}")
     
     # Konversi hex ke biner
-    binary = hex_to_binary(ciphertext_hex)  
+    binary = hex_to_binary(ciphertext_hex)
     print(f"Hasil konversi ke biner: {binary}")
     
     # Menyiapkan pola lagu dengan pemetaan biner
@@ -308,24 +260,38 @@ def main():
     print("\nMembuat musik dari pola lagu...")
     audio_data, sample_rate, note_positions = generate_music_from_prepared_song(song_pattern, "Chord")
     
-    if audio_data is None or sample_rate is None:
+    if audio_data is None or sample_rate is None or note_positions is None:
         print("Error: Gagal membuat musik steganografi")
         return
     
-    # Buat metadata
+    # Pastikan format binary_mapping sama dengan yang diharapkan Decrypt.py
+    # Dari Decrypt.py, formatnya adalah {"C-PianoChord.wav": "00", "D-PianoChord.wav": "01", ...}
+    # Buat metadata yang sesuai
     metadata = {
         "song_type": "mary_had_a_little_lamb_prepared",
         "song_name": "stegano_music_prepared",
         "note_positions": note_positions,
         "binary_mapping": binary_mapping,
-        "cipher_binary": binary
+        "cipher_binary": binary,
+        "key_length": 16  # Tambahkan informasi panjang kunci yang diharapkan
     }
+    
+    # Uji baca metadata sebelum disimpan ke file
+    try:
+        json_metadata = json.dumps(metadata)
+        json.loads(json_metadata)
+        print("Metadata valid dalam format JSON")
+    except Exception as e:
+        print(f"Error validasi metadata: {e}")
+        return
     
     # Simpan musik dengan metadata
     output_file = "output_music_prepared.wav"
     output_file = add_metadata_to_wav(audio_data, sample_rate, metadata, output_file)
     
     print(f"\nProses selesai! File output: {output_file}")
+    print("Coba dekripsi dengan menggunakan Decrypt.py")
+    print(f"Pastikan menggunakan kunci yang sama persis: '{key}'")
 
 if __name__ == "__main__":
     main()
