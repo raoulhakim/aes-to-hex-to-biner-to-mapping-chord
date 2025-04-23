@@ -85,84 +85,21 @@ def extract_metadata_from_wav(wav_path):
         return None, f"Error saat membaca file WAV: {str(e)}"
 
 def get_binary_sequence_from_metadata(metadata):
-    """Mendapatkan urutan biner dari metadata."""
+    """Mendapatkan urutan biner dari metadata, hanya menggunakan cipher_binary."""
     if not metadata:
         return None, "Metadata tidak ditemukan"
     
+    # Tampilkan metadata yang tersedia untuk debugging
     print("Metadata yang tersedia:")
     for key in metadata:
         print(f"- {key}")
     
-    # Metode 1: Gunakan urutan biner yang disimpan dalam metadata
+    # Ambil cipher_binary langsung dari metadata
     if "cipher_binary" in metadata:
         print("Menggunakan cipher_binary dari metadata")
         return metadata["cipher_binary"], None
-    
-    # Metode 2: Rekonstruksi urutan biner dari chord yang digunakan dan posisi note
-    elif "note_positions" in metadata and "binary_mapping" in metadata:
-        try:
-            print("Mencoba merekonstruksi dari note_positions dan binary_mapping")
-            note_positions = metadata["note_positions"]
-            binary_mapping = metadata["binary_mapping"]
-            
-            # Debugging
-            print(f"Jumlah posisi note: {len(note_positions)}")
-            print(f"Binary mapping: {binary_mapping}")
-            
-            # Reverse mapping - dari file chord ke nilai biner
-            rev_mapping = {}
-            for chord, binary in binary_mapping.items():
-                rev_mapping[chord] = binary
-            
-            print(f"Reverse mapping: {rev_mapping}")
-            
-            # Membangun kembali urutan biner dari posisi note
-            binary_sequence = ""
-            
-            # Asumsi bahwa semua chord yang digunakan adalah C-PianoChord.wav (00), D-PianoChord.wav (01), dll.
-            chord_keys = list(binary_mapping.keys())
-            if not chord_keys:
-                return None, "Binary mapping kosong"
-                
-            # Default ke chord pertama jika tidak ada yang cocok
-            default_chord = chord_keys[0]
-            default_binary = binary_mapping[default_chord]
-            
-            # Iterasi melalui posisi
-            for i in range(len(note_positions) - 1):
-                # Hitung durasi
-                current_pos = note_positions[i]
-                next_pos = note_positions[i+1]
-                duration = next_pos - current_pos
-                
-                # Cari chord yang sesuai
-                # Gunakan cara sederhana: ambil dari rev_mapping dengan index terurut
-                index = i % len(chord_keys)
-                chord = chord_keys[index]
-                binary = rev_mapping.get(chord, default_binary)
-                
-                binary_sequence += binary
-            
-            if binary_sequence:
-                print(f"Berhasil merekonstruksi dengan panjang: {len(binary_sequence)} bit")
-                return binary_sequence, None
-            else:
-                return None, "Gagal merekonstruksi urutan biner"
-        
-        except Exception as e:
-            print(f"Error detail: {str(e)}")
-            return None, f"Error saat merekonstruksi urutan biner: {str(e)}"
-    
     else:
-        missing = []
-        if "cipher_binary" not in metadata:
-            missing.append("cipher_binary")
-        if "note_positions" not in metadata:
-            missing.append("note_positions")
-        if "binary_mapping" not in metadata:
-            missing.append("binary_mapping")
-            
-        return None, f"Informasi yang diperlukan tidak ditemukan dalam metadata: {', '.join(missing)}"
+        return None, "Informasi cipher_binary tidak ditemukan dalam metadata"
 
 def binary_to_hex(binary_string):
     """Mengkonversi string biner ke string hex."""
@@ -249,9 +186,7 @@ def main():
         
         if error:
             print(f"Error: {error}")
-            decision = input("Tetap lanjutkan dan coba rekonstruksi manual? (y/n): ")
-            if decision.lower() != 'y':
-                return
+            return
         
         if not metadata:
             print("Error: Metadata tidak ditemukan atau kosong")
@@ -268,16 +203,10 @@ def main():
         
         if error:
             print(f"Error: {error}")
-            decision = input("Tetap lanjutkan dengan urutan biner default? (y/n): ")
-            if decision.lower() == 'y':
-                # Buat urutan biner dummy untuk testing
-                print("Menggunakan urutan biner default untuk testing")
-                binary_sequence = "01" * 32
-            else:
-                return
+            return
         
         if not binary_sequence:
-            print("Error: Urutan biner tidak dapat direkonstruksi")
+            print("Error: Urutan biner tidak ditemukan")
             return
         
         print(f"Urutan biner berhasil didapatkan: {binary_sequence[:64]}..." if len(binary_sequence) > 64 else f"Urutan biner berhasil didapatkan: {binary_sequence}")
@@ -307,17 +236,6 @@ def main():
                 attempt += 1
                 if attempt >= max_attempts:
                     print("\nTerlalu banyak percobaan gagal. Program berhenti.")
-                    # Opsi untuk bypass password
-                    bypass = input("Bypass password untuk melihat hasil mentah (hanya untuk debugging)? (y/n): ")
-                    if bypass.lower() == 'y':
-                        try:
-                            # Coba dekripsi dengan password kosong (untuk debugging)
-                            raw_decrypted = AES.new(key.encode(), AES.MODE_ECB).decrypt(binascii.unhexlify(hex_string))
-                            print("\nHasil dekripsi (raw):")
-                            print(f"HEX: {binascii.hexlify(raw_decrypted).decode()[:100]}")
-                            print(f"Coba decode UTF-8: {raw_decrypted[:100]}")
-                        except:
-                            print("Gagal melakukan debugging dekripsi")
                     return
                 continue
             

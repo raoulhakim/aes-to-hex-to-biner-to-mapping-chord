@@ -313,16 +313,10 @@ def main():
         print("Error: Gagal membuat musik steganografi")
         return
     
-    # Pastikan format binary_mapping sama dengan yang diharapkan Decrypt.py
-    # Dari Decrypt.py, formatnya adalah {"C-PianoChord.wav": "00", "D-PianoChord.wav": "01", ...}
-    # Buat metadata yang sesuai
+    # Metadata hanya berisi cipher_binary dan key_length saja
     metadata = {
-        "song_type": "mary_had_a_little_lamb_prepared",
-        "song_name": "stegano_music_prepared",
-        "note_positions": note_positions,
-        "binary_mapping": binary_mapping,
         "cipher_binary": binary,
-        "key_length": 16  # Tambahkan informasi panjang kunci yang diharapkan
+        "key_length": 16
     }
     
     # Uji baca metadata sebelum disimpan ke file
