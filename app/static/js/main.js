@@ -4,15 +4,15 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // Animasi logo saat halaman dimuat
-    const logo = document.querySelector('.app-logo');
-    if (logo) {
-        logo.style.transition = 'transform 0.5s ease-in-out';
-        logo.style.transform = 'scale(1.1)';
+    // const logo = document.querySelector('.app-logo');
+    // if (logo) {
+    //     logo.style.transition = 'transform 0.5s ease-in-out';
+    //     logo.style.transform = 'scale(1.1)';
         
-        setTimeout(() => {
-            logo.style.transform = 'scale(1)';
-        }, 300);
-    }
+    //     setTimeout(() => {
+    //         logo.style.transform = 'scale(1)';
+    //     }, 300);
+    // }
     
     // Tooltips Bootstrap (jika diperlukan nanti)
     if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {

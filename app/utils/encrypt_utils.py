@@ -167,7 +167,7 @@ def generate_music_from_prepared_song(song_pattern, chord_dir):
         
         if not os.path.exists(chord_path):
             # Coba gunakan file alternatif berdasarkan binary mapping
-            chord_filename = binary_to_chord.get(binary, "C-PianoChord.wav")  # Default ke C jika tidak ada
+            chord_filename = binary_to_chord.get(binary)
             chord_path = os.path.join(chord_dir, chord_filename)
             
             if not os.path.exists(chord_path):
