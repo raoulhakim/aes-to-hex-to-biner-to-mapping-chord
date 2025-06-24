@@ -1,0 +1,227 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+.search-highlight {
+    background-color: #007bff;
+    color: white;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+.search-active {
+    background-color: #ffc107 !important;
+    color: black !important;
+    font-weight: bold;
+    border: 1px solid #000;
+}
+</style>
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2>Log Viewer</h2>
+        <div>
+            <button id="refreshBtn" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+            </button>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-house"></i> Beranda
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="mb-3">
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchInput" placeholder="Cari logs...">
+                <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                    <i class="bi bi-search"></i> Cari
+                </button>
+                <button class="btn btn-outline-secondary" type="button" id="prevBtn">
+                    <i class="bi bi-chevron-up"></i>
+                </button>
+                <button class="btn btn-outline-secondary" type="button" id="nextBtn">
+                    <i class="bi bi-chevron-down"></i>
+                </button>
+                <button class="btn btn-outline-secondary" type="button" id="clearBtn">
+                    <i class="bi bi-x-lg"></i> Clear
+                </button>
+            </div>
+            <div class="form-text" id="searchInfo"></div>
+        </div>
+
+        <div class="mb-3">
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-outline-info filter-btn" data-level="INFO">INFO</button>
+                <button type="button" class="btn btn-sm btn-outline-warning filter-btn" data-level="WARNING">WARNING</button>
+                <button type="button" class="btn btn-sm btn-outline-danger filter-btn" data-level="ERROR">ERROR</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary filter-btn" data-level="DEBUG">DEBUG</button>
+                <button type="button" class="btn btn-sm btn-outline-dark filter-btn" data-level="ALL">ALL</button>
+            </div>
+        </div>
+        
+        <div class="log-container p-3 bg-dark text-light" style="height: 500px; overflow-y: scroll; font-family: monospace; font-size: 0.85em;">
+            {% for log in logs %}
+                <div class="log-line {% if 'ERROR' in log %}text-danger{% elif 'WARNING' in log %}text-warning{% elif 'INFO' in log %}text-info{% elif 'DEBUG' in log %}text-secondary{% endif %}">
+                    {{ log }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const logContainer = document.querySelector('.log-container');
+    const clearBtn = document.getElementById('clearBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    
+    // Scroll ke bawah secara default untuk menampilkan log terbaru
+    logContainer.scrollTop = logContainer.scrollHeight;
+    
+    // Variabel untuk fungsi pencarian
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const searchInfo = document.getElementById('searchInfo');
+    let searchResults = [];
+    let currentResultIndex = -1;
+    
+    // Fungsi pencarian
+    function searchLogs() {
+        // Reset hasil pencarian sebelumnya
+        searchResults = [];
+        currentResultIndex = -1;
+        
+        // Hapus highlight sebelumnya
+        document.querySelectorAll('.search-highlight').forEach(el => {
+            el.outerHTML = el.innerHTML;
+        });
+        
+        const searchText = searchInput.value.toLowerCase().trim();
+        if (!searchText) {
+            searchInfo.textContent = '';
+            return;
+        }
+        
+        const logLines = document.querySelectorAll('.log-line');
+        
+        // Cari semua baris yang cocok
+        logLines.forEach((line, index) => {
+            const text = line.textContent.toLowerCase();
+            if (text.includes(searchText)) {
+                searchResults.push(index);
+                
+                // Highlight teks yang cocok
+                const innerHTML = line.innerHTML;
+                const regex = new RegExp(searchText, 'gi');
+                line.innerHTML = innerHTML.replace(regex, match => 
+                    `<span class="search-highlight bg-primary text-white">${match}</span>`
+                );
+            }
+        });
+        
+        // Update info pencarian
+        if (searchResults.length > 0) {
+            goToResult(0);
+            searchInfo.textContent = `${searchResults.length} hasil ditemukan`;
+        } else {
+            searchInfo.textContent = 'Tidak ditemukan hasil';
+        }
+    }
+    
+    // Pindah ke hasil pencarian tertentu
+    function goToResult(index) {
+        if (searchResults.length === 0) return;
+        
+        // Pastikan index dalam batas yang valid
+        currentResultIndex = index;
+        if (currentResultIndex < 0) currentResultIndex = searchResults.length - 1;
+        if (currentResultIndex >= searchResults.length) currentResultIndex = 0;
+        
+        // Hapus highlight aktif sebelumnya
+        document.querySelectorAll('.search-active').forEach(el => {
+            el.classList.remove('search-active');
+        });
+        
+        // Scroll ke hasil yang dipilih
+        const logLines = document.querySelectorAll('.log-line');
+        const targetLine = logLines[searchResults[currentResultIndex]];
+        
+        // Tambah highlight untuk hasil aktif
+        targetLine.querySelectorAll('.search-highlight').forEach(el => {
+            el.classList.add('search-active');
+        });
+        
+        // Scroll ke posisi elemen
+        targetLine.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        
+        // Update info pencarian
+        searchInfo.textContent = `Hasil ${currentResultIndex + 1} dari ${searchResults.length}`;
+    }
+    
+    // Event handler untuk tombol pencarian
+    searchBtn.addEventListener('click', searchLogs);
+    
+    // Event handler untuk tombol enter pada input pencarian
+    searchInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+            searchLogs();
+        }
+    });
+    
+    // Event handler untuk tombol navigasi
+    prevBtn.addEventListener('click', () => goToResult(currentResultIndex - 1));
+    nextBtn.addEventListener('click', () => goToResult(currentResultIndex + 1));
+    
+    // Tombol clear pencarian
+    clearBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        searchInfo.textContent = '';
+        searchResults = [];
+        currentResultIndex = -1;
+        
+        // Hapus semua highlight
+        document.querySelectorAll('.search-highlight').forEach(el => {
+            el.outerHTML = el.innerHTML;
+        });
+    });
+    
+    // Tombol refresh halaman
+    refreshBtn.addEventListener('click', function() {
+        location.reload();
+    });
+    
+    // Filter berdasarkan level log
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const level = this.getAttribute('data-level');
+            
+            // Highlight tombol yang aktif
+            filterBtns.forEach(b => b.classList.remove('active', 'btn-primary', 'btn-warning', 'btn-danger', 'btn-secondary', 'btn-dark'));
+            
+            if (level === 'INFO') {
+                this.classList.add('active', 'btn-info');
+            } else if (level === 'WARNING') {
+                this.classList.add('active', 'btn-warning');
+            } else if (level === 'ERROR') {
+                this.classList.add('active', 'btn-danger');
+            } else if (level === 'DEBUG') {
+                this.classList.add('active', 'btn-secondary');
+            } else {
+                this.classList.add('active', 'btn-dark');
+            }
+            
+            const logLines = document.querySelectorAll('.log-line');
+            logLines.forEach(line => {
+                const text = line.textContent;
+                if (level === 'ALL' || text.includes(level)) {
+                    line.style.display = '';
+                } else {
+                    line.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %} 

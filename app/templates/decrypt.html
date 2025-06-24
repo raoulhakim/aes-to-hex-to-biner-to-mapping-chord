@@ -8,7 +8,6 @@
     <div class="card-body">
         <p class="mb-4">Unggah file audio yang berisi pesan tersembunyi dan masukkan kunci dekripsi untuk mengekstrak pesan asli.</p>
         
-        <!-- Progress bar (awalnya disembunyikan) -->
         <div id="progressContainer" class="mb-4 d-none">
             <h5 class="mb-3">Proses Dekripsi Sedang Berjalan...</h5>
             
@@ -37,6 +36,12 @@
                 <label for="key" class="form-label">Kunci Dekripsi</label>
                 <input type="text" class="form-control" id="key" name="key" required minlength="16" maxlength="16">
                 <div class="form-text">Masukkan kunci yang sama persis dengan yang digunakan saat enkripsi (16 karakter).</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="chord_positions" class="form-label">Posisi Chord (Password Kedua)</label>
+                <input type="text" class="form-control" id="chord_positions" name="chord_positions" placeholder="contoh: 1,3,12" required>
+                <div class="form-text">Masukkan posisi-posisi chord yang berisi data tersembunyi, dipisahkan dengan koma.</div>
             </div>
             
             <div class="mb-3">
