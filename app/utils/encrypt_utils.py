@@ -152,12 +152,12 @@ def prepare_song_with_binary(binary_string):
             for pos, note in enumerate(iter_notes):
                 if note == target_note and not positions_used[pos]:
                     # Posisi ditemukan di perulangan yang sudah ada
-                    absolute_position = start_pos + pos
+                    chord_idx_position = start_pos + pos
                     positions_used[pos] = True  # Tandai posisi ini sudah digunakan
                     
                     # Simpan mapping
-                    chord_positions_by_index[current_segment_index] = absolute_position
-                    position_mapping[absolute_position] = {
+                    chord_positions_by_index[current_segment_index] = chord_idx_position
+                    position_mapping[chord_idx_position] = {
                         "binary": binary_segment,
                         "note": note,
                         "perulangan": iter_idx,
@@ -165,7 +165,7 @@ def prepare_song_with_binary(binary_string):
                         "segment_index": current_segment_index
                     }
                     
-                    logger.info(f"[PREPARE_SONG] Memetakan '{binary_segment}' \u2192 Nada {note} di posisi {pos} (absolut: {absolute_position}, segmen_idx: {current_segment_index}) [MENGISI POSISI KOSONG DI PERULANGAN {iter_idx+1}]")
+                    logger.info(f"[PREPARE_SONG] Memetakan '{binary_segment}' \u2192 Nada {note} di posisi {pos} (chord_idx: {chord_idx_position}, segmen_idx: {current_segment_index}) [MENGISI POSISI KOSONG DI PERULANGAN {iter_idx+1}]")
                     
                     segment_mapped = True
                     break
@@ -182,7 +182,7 @@ def prepare_song_with_binary(binary_string):
             
             logger.info(f"[PREPARE_SONG] Memulai perulangan ke-{iteration+1}")
             
-            # Posisi awal absolut untuk perulangan ini
+            # Posisi awal chord_idx untuk perulangan ini
             iteration_start_pos = len(song_pattern)
             
             # Buat array untuk melacak posisi yang sudah digunakan
@@ -200,12 +200,12 @@ def prepare_song_with_binary(binary_string):
             for pos, note in enumerate(melody_notes):
                 if note == target_note:
                     # Posisi ditemukan
-                    absolute_position = iteration_start_pos + pos
+                    chord_idx_position = iteration_start_pos + pos
                     positions_used[pos] = True  # Tandai posisi ini sudah digunakan
                     
                     # Simpan mapping
-                    chord_positions_by_index[current_segment_index] = absolute_position
-                    position_mapping[absolute_position] = {
+                    chord_positions_by_index[current_segment_index] = chord_idx_position
+                    position_mapping[chord_idx_position] = {
                         "binary": binary_segment,
                         "note": note,
                         "perulangan": iteration,
@@ -213,7 +213,7 @@ def prepare_song_with_binary(binary_string):
                         "segment_index": current_segment_index
                     }
                     
-                    logger.info(f"[PREPARE_SONG] Memetakan '{binary_segment}' \u2192 Nada {note} di posisi {pos} (absolut: {absolute_position}, segmen_idx: {current_segment_index})")
+                    logger.info(f"[PREPARE_SONG] Memetakan '{binary_segment}' \u2192 Nada {note} di posisi {pos} (chord_idx: {chord_idx_position}, segmen_idx: {current_segment_index})")
                     
                     position_found = True
                     break
@@ -226,11 +226,11 @@ def prepare_song_with_binary(binary_string):
             
             # Buat pola lagu untuk perulangan ini
             for pos, note in enumerate(melody_notes):
-                absolute_pos = iteration_start_pos + pos
+                chord_idx_pos = iteration_start_pos + pos
                 is_used = positions_used[pos]
                 
                 if is_used:
-                    segment_info = position_mapping.get(absolute_pos)
+                    segment_info = position_mapping.get(chord_idx_pos)
                     bin_segment = segment_info.get("binary") if segment_info else None
                     song_pattern.append((note, melody_durations[pos], bin_segment))
                 else:

@@ -191,8 +191,8 @@ def extract_binary_from_exact_positions(chord_positions):
             if current_perulangan > 0:
                 song_pattern.append("PAUSE")
                 pattern_debugger.append(f"{position_counter}: PAUSE")
-                # PENTING: Jeda ini menambah 1 posisi, sehingga perulangan berikutnya dimulai dari indeks+1
-                logger.info(f"[EXTRACT_BINARY] Menambahkan jeda di posisi {position_counter} (ini menyebabkan perulangan berikutnya dimulai dari indeks {position_counter+1})")
+                # PENTING: Jeda ini menambah 1 posisi, sehingga perulangan berikutnya dimulai dari chord_idx+1
+                logger.info(f"[EXTRACT_BINARY] Menambahkan jeda di posisi {position_counter} (ini menyebabkan perulangan berikutnya dimulai dari chord_idx {position_counter+1})")
                 position_counter += 1
             
             # Tambahkan satu perulangan lagu Mary Had a Little Lamb
@@ -203,7 +203,7 @@ def extract_binary_from_exact_positions(chord_positions):
             
             current_perulangan += 1
             logger.info(f"[EXTRACT_BINARY] Perulangan {current_perulangan} selesai, total posisi: {position_counter}")
-            logger.info(f"[EXTRACT_BINARY] Jika ada perulangan berikutnya, akan dimulai dari indeks {position_counter}")
+            logger.info(f"[EXTRACT_BINARY] Jika ada perulangan berikutnya, akan dimulai dari chord_idx {position_counter}")
             
             # Debug jika diperlukan
             if position_counter > max_pos + 100:  # Prevent infinite loops
@@ -230,15 +230,15 @@ def extract_binary_from_exact_positions(chord_positions):
                 note = song_pattern[pos]
                 if note == "PAUSE":
                     # Abaikan PAUSE dalam rekonstruksi biner
-                    logger.info(f"[EXTRACT_BINARY] Posisi {pos}: {note} -> Mengabaikan (bukan data)")
+                    logger.info(f"[EXTRACT_BINARY] Chord_idx {pos}: {note} -> Mengabaikan (bukan data)")
                     continue
                 else:
                     # Pastikan kita menggunakan pemetaan yang konsisten dengan enkripsi
                     binary = note_to_binary.get(note, "00")
-                    logger.info(f"[EXTRACT_BINARY] Posisi {pos}: Nada {note} -> Biner {binary}")
+                    logger.info(f"[EXTRACT_BINARY] Chord_idx {pos}: Nada {note} -> Biner {binary}")
                     binary_segments.append(binary)
             else:
-                logger.error(f"[EXTRACT_BINARY] ERROR: Posisi {pos} di luar jangkauan pola lagu")
+                logger.error(f"[EXTRACT_BINARY] ERROR: Chord_idx {pos} di luar jangkauan pola lagu")
                 raise ValueError(f"Posisi chord {pos} di luar jangkauan pola lagu (panjang {len(song_pattern)})")
         
         # Gabung semua segmen biner
