@@ -299,22 +299,9 @@ def generate_music_from_prepared_song(song_pattern, chord_dir):
         else:
             logger.info(f"[GENERATE_MUSIC] Nada {i}: {note} (durasi {duration}, biner {binary})")
     
-    # Mencari tahu berapa dimensi audio yang digunakan (untuk memastikan jeda konsisten)
-    channels = 1  # Default ke mono jika tidak ada file chord
-    for note, _, binary in song_pattern:
-        if note != "PAUSE":
-            chord_prefix = note
-            chord_filename = f"{chord_prefix}-PianoChord.wav"
-            chord_path = os.path.join(chord_dir, chord_filename)
-            if os.path.exists(chord_path):
-                try:
-                    rate, audio = wavfile.read(chord_path)
-                    if len(audio.shape) > 1:
-                        channels = audio.shape[1]  # Ambil jumlah kanal (1=mono, 2=stereo)
-                    logger.info(f"[GENERATE_MUSIC] Audio menggunakan {channels} kanal (stereo={channels>1})")
-                    break
-                except Exception:
-                    pass
+    # Selalu gunakan mono untuk ukuran file yang lebih kecil
+    channels = 1  # Tetapkan channels ke 1 (mono) untuk semua audio
+    logger.info(f"[GENERATE_MUSIC] Menggunakan format audio mono untuk menghemat ukuran file")
     
     logger.info(f"[GENERATE_MUSIC] Memproses {len(song_pattern)} nada dalam pola lagu")
     
@@ -345,11 +332,8 @@ def generate_music_from_prepared_song(song_pattern, chord_dir):
             pause_duration = int(sample_rate * 0.5 * duration)  # 0.5 detik per unit durasi
             logger.info(f"[GENERATE_MUSIC] Menambahkan jeda dengan durasi {duration} unit ({pause_duration/sample_rate:.2f} detik)")
             
-            # Buat keheningan dengan dimensi yang sama dengan audio
-            if channels > 1:
-                silence = np.zeros((pause_duration, channels), dtype=np.int16)
-            else:
-                silence = np.zeros(pause_duration, dtype=np.int16)
+            # Buat keheningan mono
+            silence = np.zeros(pause_duration, dtype=np.int16)
                 
             audio_segments.append(silence)
             
@@ -376,6 +360,12 @@ def generate_music_from_prepared_song(song_pattern, chord_dir):
         try:
             # Baca file chord
             rate, audio = wavfile.read(chord_path)
+            
+            # Konversi stereo ke mono jika diperlukan
+            if len(audio.shape) > 1:  # Jika stereo
+                audio = np.mean(audio, axis=1).astype(np.int16)  # Konversi ke mono dengan mengambil rata-rata
+                logger.info(f"[GENERATE_MUSIC] Mengkonversi audio stereo ke mono untuk {chord_filename}")
+            
             logger.info(f"[GENERATE_MUSIC] Membaca chord: {chord_filename} (rate={rate}Hz, panjang={len(audio)})")
             
             # Hitung durasi berdasarkan ketukan (1.0 = 0.5 detik)
@@ -386,11 +376,8 @@ def generate_music_from_prepared_song(song_pattern, chord_dir):
                 adjusted_audio = audio[:beat_duration]
                 logger.info(f"[GENERATE_MUSIC] Memotong audio ke durasi {duration} unit ({beat_duration/sample_rate:.2f} detik)")
             else:
-                # Buat padding dengan dimensi yang tepat
-                if len(audio.shape) > 1:  # Stereo
-                    padding = np.zeros((beat_duration - len(audio), audio.shape[1]), dtype=audio.dtype)
-                else:  # Mono
-                    padding = np.zeros(beat_duration - len(audio), dtype=audio.dtype)
+                # Buat padding mono
+                padding = np.zeros(beat_duration - len(audio), dtype=audio.dtype)
                 adjusted_audio = np.concatenate([audio, padding])
                 logger.info(f"[GENERATE_MUSIC] Menambahkan padding ke audio untuk durasi {duration} unit ({beat_duration/sample_rate:.2f} detik)")
             
@@ -412,6 +399,7 @@ def generate_music_from_prepared_song(song_pattern, chord_dir):
         combined_audio = np.concatenate(audio_segments)
         logger.info(f"[GENERATE_MUSIC] Berhasil menggabungkan {len(audio_segments)} segmen audio")
         logger.info(f"[GENERATE_MUSIC] Total durasi audio: {len(combined_audio)/sample_rate:.2f} detik")
+        logger.info(f"[GENERATE_MUSIC] Format audio: mono (1 channel)")
         logger.info("="*50 + "\n")
         return combined_audio, sample_rate, note_positions
     except ValueError as e:
