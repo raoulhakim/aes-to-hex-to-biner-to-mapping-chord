@@ -170,7 +170,7 @@ def extract_binary_from_exact_positions(chord_positions):
         # Rekonstruksi pola lagu
         song_pattern = []
         pattern_debugger = []
-        current_iteration = 0
+        current_perulangan = 0
         position_counter = 0
         max_pos = max(chord_positions)
         
@@ -187,23 +187,23 @@ def extract_binary_from_exact_positions(chord_positions):
         
         # Rekonstruksi pola lagu untuk mendapatkan nada di posisi tertentu
         while position_counter <= max_pos:
-            # Tambahkan jeda antar iterasi (kecuali pada iterasi pertama)
-            if current_iteration > 0:
+            # Tambahkan jeda antar perulangan (kecuali pada perulangan pertama)
+            if current_perulangan > 0:
                 song_pattern.append("PAUSE")
                 pattern_debugger.append(f"{position_counter}: PAUSE")
-                # PENTING: Jeda ini menambah 1 posisi, sehingga iterasi berikutnya dimulai dari indeks+1
-                logger.info(f"[EXTRACT_BINARY] Menambahkan jeda di posisi {position_counter} (ini menyebabkan iterasi berikutnya dimulai dari indeks {position_counter+1})")
+                # PENTING: Jeda ini menambah 1 posisi, sehingga perulangan berikutnya dimulai dari indeks+1
+                logger.info(f"[EXTRACT_BINARY] Menambahkan jeda di posisi {position_counter} (ini menyebabkan perulangan berikutnya dimulai dari indeks {position_counter+1})")
                 position_counter += 1
             
-            # Tambahkan satu iterasi lagu Mary Had a Little Lamb
+            # Tambahkan satu perulangan lagu Mary Had a Little Lamb
             for note in melody_notes:
                 song_pattern.append(note)
                 pattern_debugger.append(f"{position_counter}: {note}")
                 position_counter += 1
             
-            current_iteration += 1
-            logger.info(f"[EXTRACT_BINARY] Iterasi {current_iteration} selesai, total posisi: {position_counter}")
-            logger.info(f"[EXTRACT_BINARY] Jika ada iterasi berikutnya, akan dimulai dari indeks {position_counter}")
+            current_perulangan += 1
+            logger.info(f"[EXTRACT_BINARY] Perulangan {current_perulangan} selesai, total posisi: {position_counter}")
+            logger.info(f"[EXTRACT_BINARY] Jika ada perulangan berikutnya, akan dimulai dari indeks {position_counter}")
             
             # Debug jika diperlukan
             if position_counter > max_pos + 100:  # Prevent infinite loops

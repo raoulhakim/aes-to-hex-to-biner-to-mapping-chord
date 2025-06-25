@@ -129,20 +129,20 @@ def prepare_song_with_binary(binary_string):
     chord_positions_by_index = [None] * len(binary_segments)
     position_mapping = {}
     
-    # Variabel untuk melacak iterasi
+    # Variabel untuk melacak perulangan
     iteration = 0
-    iterations_data = []  # Menyimpan data tentang setiap iterasi
+    iterations_data = []  # Menyimpan data tentang setiap perulangan
     
     # Proses semua segmen biner
     current_segment_index = 0
     
     while current_segment_index < len(binary_segments):
-        # Coba cari di iterasi yang sudah ada terlebih dahulu
+        # Coba cari di perulangan yang sudah ada terlebih dahulu
         segment_mapped = False
         binary_segment = binary_segments[current_segment_index]
         target_note = binary_to_note.get(binary_segment)
         
-        # Cek di semua iterasi yang sudah ada
+        # Cek di semua perulangan yang sudah ada
         for iter_idx, iter_data in enumerate(iterations_data):
             positions_used = iter_data['positions_used']
             iter_notes = iter_data['notes']
@@ -151,7 +151,7 @@ def prepare_song_with_binary(binary_string):
             # Cari posisi yang cocok dan belum digunakan
             for pos, note in enumerate(iter_notes):
                 if note == target_note and not positions_used[pos]:
-                    # Posisi ditemukan di iterasi yang sudah ada
+                    # Posisi ditemukan di perulangan yang sudah ada
                     absolute_position = start_pos + pos
                     positions_used[pos] = True  # Tandai posisi ini sudah digunakan
                     
@@ -160,12 +160,12 @@ def prepare_song_with_binary(binary_string):
                     position_mapping[absolute_position] = {
                         "binary": binary_segment,
                         "note": note,
-                        "iteration": iter_idx,
+                        "perulangan": iter_idx,
                         "relative_position": pos,
                         "segment_index": current_segment_index
                     }
                     
-                    logger.info(f"[PREPARE_SONG] Memetakan '{binary_segment}' \u2192 Nada {note} di posisi {pos} (absolut: {absolute_position}, segmen_idx: {current_segment_index}) [MENGISI POSISI KOSONG DI ITERASI {iter_idx+1}]")
+                    logger.info(f"[PREPARE_SONG] Memetakan '{binary_segment}' \u2192 Nada {note} di posisi {pos} (absolut: {absolute_position}, segmen_idx: {current_segment_index}) [MENGISI POSISI KOSONG DI PERULANGAN {iter_idx+1}]")
                     
                     segment_mapped = True
                     break
@@ -173,29 +173,29 @@ def prepare_song_with_binary(binary_string):
             if segment_mapped:
                 break
         
-        # Jika tidak menemukan posisi di iterasi yang ada, buat iterasi baru
+        # Jika tidak menemukan posisi di perulangan yang ada, buat perulangan baru
         if not segment_mapped:
-            # Tambahkan jeda antar iterasi kecuali di putaran pertama
+            # Tambahkan jeda antar perulangan kecuali di putaran pertama
             if iteration > 0:
-                logger.info(f"[PREPARE_SONG] Menambahkan jeda setelah iterasi ke-{iteration}")
+                logger.info(f"[PREPARE_SONG] Menambahkan jeda setelah perulangan ke-{iteration}")
                 song_pattern.append(("PAUSE", 4.0, None))
             
-            logger.info(f"[PREPARE_SONG] Memulai iterasi ke-{iteration+1}")
+            logger.info(f"[PREPARE_SONG] Memulai perulangan ke-{iteration+1}")
             
-            # Posisi awal absolut untuk iterasi ini
+            # Posisi awal absolut untuk perulangan ini
             iteration_start_pos = len(song_pattern)
             
             # Buat array untuk melacak posisi yang sudah digunakan
             positions_used = [False] * len(melody_notes)
             
-            # Simpan informasi iterasi ini
+            # Simpan informasi perulangan ini
             iterations_data.append({
                 'start_pos': iteration_start_pos,
                 'positions_used': positions_used,
                 'notes': melody_notes.copy()
             })
             
-            # Cari posisi yang cocok di iterasi baru ini
+            # Cari posisi yang cocok di perulangan baru ini
             position_found = False
             for pos, note in enumerate(melody_notes):
                 if note == target_note:
@@ -208,7 +208,7 @@ def prepare_song_with_binary(binary_string):
                     position_mapping[absolute_position] = {
                         "binary": binary_segment,
                         "note": note,
-                        "iteration": iteration,
+                        "perulangan": iteration,
                         "relative_position": pos,
                         "segment_index": current_segment_index
                     }
@@ -219,12 +219,12 @@ def prepare_song_with_binary(binary_string):
                     break
             
             if not position_found:
-                logger.warning(f"[PREPARE_SONG] Tidak menemukan posisi untuk segmen '{binary_segment}' di iterasi baru, ini tidak seharusnya terjadi!")
+                logger.warning(f"[PREPARE_SONG] Tidak menemukan posisi untuk segmen '{binary_segment}' di perulangan baru, ini tidak seharusnya terjadi!")
                 # Skip segmen ini jika tidak menemukan posisi (seharusnya tidak terjadi)
                 current_segment_index += 1
                 continue
             
-            # Buat pola lagu untuk iterasi ini
+            # Buat pola lagu untuk perulangan ini
             for pos, note in enumerate(melody_notes):
                 absolute_pos = iteration_start_pos + pos
                 is_used = positions_used[pos]
@@ -237,12 +237,12 @@ def prepare_song_with_binary(binary_string):
                     song_pattern.append((note, melody_durations[pos], None))
             
             # Debug info
-            logger.info(f"[PREPARE_SONG] Iterasi {iteration+1}: Berhasil memetakan 1 segmen biner")
+            logger.info(f"[PREPARE_SONG] Perulangan {iteration+1}: Berhasil memetakan 1 segmen biner")
             logger.info(f"[PREPARE_SONG] Total kemajuan: {current_segment_index+1}/{len(binary_segments)} segmen")
             
             # Verifikasi pola melodi untuk debug
             pattern_notes = [item[0] for item in song_pattern[-melody_length:] if item[0] != "PAUSE"]
-            logger.info("[PREPARE_SONG] Pola melodi dalam iterasi ini:")
+            logger.info("[PREPARE_SONG] Pola melodi dalam perulangan ini:")
             logger.info(f"[PREPARE_SONG] Pola aktual: {', '.join([str(n) for n in pattern_notes if n is not None])}")
             logger.info(f"[PREPARE_SONG] Pola asli: {', '.join([str(n) for n in melody_notes])}")
             
@@ -253,7 +253,7 @@ def prepare_song_with_binary(binary_string):
         
         # Keamanan agar tidak loop tanpa akhir
         if iteration > 100:
-            logger.error("[PREPARE_SONG] Terlalu banyak iterasi, menghentikan proses.")
+            logger.error("[PREPARE_SONG] Terlalu banyak perulangan, menghentikan proses.")
             break
     
     logger.info(f"[PREPARE_SONG] Pola lagu selesai dibuat dengan {len(song_pattern)} nada")
@@ -263,7 +263,7 @@ def prepare_song_with_binary(binary_string):
     # Bangun daftar chord_positions sesuai urutan asli segmen biner
     chord_positions = [pos for pos in chord_positions_by_index if pos is not None]
     
-    # Tulis urutan chord position sesuai indeks segmen untuk debugging
+    # Tulis urutan segmen biner (untuk debugging)
     logger.info(f"[PREPARE_SONG] Urutan segmen biner (untuk debugging): {binary_segments[:10]}...")
     logger.info(f"[PREPARE_SONG] Chord positions (ordered by segment index): {chord_positions}")
     logger.info("="*50 + "\n")
@@ -281,21 +281,21 @@ def generate_music_from_prepared_song(song_pattern, chord_dir):
     
     # Debug: Tampilkan pola lagu yang akan diproses
     logger.info("[GENERATE_MUSIC] Pola lagu yang akan diproses:")
-    current_iteration = 0
-    iteration_start = 0
+    current_perulangan = 0
+    perulangan_start = 0
     
     for i, (note, duration, binary) in enumerate(song_pattern):
         if note == "PAUSE":
-            logger.info(f"[GENERATE_MUSIC] --- Akhir iterasi {current_iteration+1} ---")
+            logger.info(f"[GENERATE_MUSIC] --- Akhir perulangan {current_perulangan+1} ---")
             # Bandingkan dengan pola Mary Had a Little Lamb
-            if i > iteration_start:
+            if i > perulangan_start:
                 original_pattern = ", ".join([f"{note}" for note, _ in mary_had_a_little_lamb])
-                actual_pattern = ", ".join([f"{note}" for note, _, _ in song_pattern[iteration_start:i]])
+                actual_pattern = ", ".join([f"{note}" for note, _, _ in song_pattern[perulangan_start:i]])
                 logger.info(f"[GENERATE_MUSIC] Pola asli: {original_pattern}")
                 logger.info(f"[GENERATE_MUSIC] Pola aktual: {actual_pattern}")
             
-            iteration_start = i + 1
-            current_iteration += 1
+            perulangan_start = i + 1
+            current_perulangan += 1
         else:
             logger.info(f"[GENERATE_MUSIC] Nada {i}: {note} (durasi {duration}, biner {binary})")
     
@@ -307,16 +307,16 @@ def generate_music_from_prepared_song(song_pattern, chord_dir):
     
     # Verifikasi jika pola sesuai dengan Mary Had a Little Lamb
     # Jika tidak ada nada dalam pola pertama, gunakan pola Mary Had a Little Lamb asli
-    first_iteration_empty = True
+    first_perulangan_empty = True
     for i, (note, duration, binary) in enumerate(song_pattern):
         if note == "PAUSE":
             break
         if note != "PAUSE":
-            first_iteration_empty = False
+            first_perulangan_empty = False
     
-    # Jika tidak ada nada yang dimainkan dalam iterasi pertama, gunakan pola asli
-    if first_iteration_empty:
-        logger.warning("[GENERATE_MUSIC] PERINGATAN: Iterasi pertama kosong, menggunakan pola lagu asli")
+    # Jika tidak ada nada yang dimainkan dalam perulangan pertama, gunakan pola asli
+    if first_perulangan_empty:
+        logger.warning("[GENERATE_MUSIC] PERINGATAN: Perulangan pertama kosong, menggunakan pola lagu asli")
         # Buat mapping sederhana dari nada ke biner
         note_to_binary = {"C": "00", "D": "01", "E": "10", "G": "11"}
         # Tambahkan pola lagu asli ke awal song_pattern
@@ -445,15 +445,15 @@ def binary_to_audio(hex_string, output_dir="app/static/uploads", chord_dir="Chor
         "chord_positions_str": ",".join(map(str, chord_positions))
     }
     
-    # Hitung jumlah iterasi lagu dari song_pattern
-    iteration_count = 1  # Minimal 1 iterasi
+    # Hitung jumlah perulangan lagu dari song_pattern
+    perulangan_count = 1  # Minimal 1 perulangan
     for note, _, _ in song_pattern:
         if note == "PAUSE":
-            iteration_count += 1
+            perulangan_count += 1
     
     logger.info(f"[BINARY_TO_AUDIO] Nama file output: {output_filename}")
     logger.info("[BINARY_TO_AUDIO] Proses konversi hex ke audio steganografi selesai")
-    logger.info(f"[BINARY_TO_AUDIO] Lagu Mary Had a Little Lamb diulang sebanyak {iteration_count} kali")
+    logger.info(f"[BINARY_TO_AUDIO] Lagu Mary Had a Little Lamb diulang sebanyak {perulangan_count} kali")
     logger.info(f"[BINARY_TO_AUDIO] PENTING: Password kedua (posisi chord): {chord_positions}")
     logger.info("[BINARY_TO_AUDIO] Pastikan pengguna menyimpan posisi chord ini untuk dekripsi!")
     logger.info("="*50 + "\n")
