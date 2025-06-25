@@ -457,8 +457,15 @@ def binary_to_audio(hex_string, output_dir="app/static/uploads", chord_dir="Chor
         "chord_positions_str": ",".join(map(str, chord_positions))
     }
     
+    # Hitung jumlah iterasi lagu dari song_pattern
+    iteration_count = 1  # Minimal 1 iterasi
+    for note, _, _ in song_pattern:
+        if note == "PAUSE":
+            iteration_count += 1
+    
     logger.info(f"[BINARY_TO_AUDIO] Nama file output: {output_filename}")
     logger.info("[BINARY_TO_AUDIO] Proses konversi hex ke audio steganografi selesai")
+    logger.info(f"[BINARY_TO_AUDIO] Lagu Mary Had a Little Lamb diulang sebanyak {iteration_count} kali")
     logger.info(f"[BINARY_TO_AUDIO] PENTING: Password kedua (posisi chord): {chord_positions}")
     logger.info("[BINARY_TO_AUDIO] Pastikan pengguna menyimpan posisi chord ini untuk dekripsi!")
     logger.info("="*50 + "\n")
