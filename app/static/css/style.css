@@ -432,4 +432,8 @@ li {
 
 .border-gradient {
     border: 1px solid var(--border-color);
+}
+
+.list-group-item {
+    color: #fff !important;
 } 
