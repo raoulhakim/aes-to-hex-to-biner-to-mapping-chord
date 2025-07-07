@@ -196,8 +196,8 @@ audio {
 .jumbotron .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(126, 110, 226, 0.6), 0 0 20px rgba(126, 110, 226, 0.3);
-}
-
+    }
+    
 .btn-secondary {
     background-color: var(--dark-bg);
     border-color: var(--border-color);
