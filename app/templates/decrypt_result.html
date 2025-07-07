@@ -3,51 +3,79 @@
 {% block content %}
 <div class="card">
     <div class="card-header">
-        <h2>Hasil Dekripsi</h2>
+        <i class="bi bi-shield-check me-2"></i>
+        Hasil Dekripsi
     </div>
     <div class="card-body">
         <div class="alert alert-success mb-4">
-            <h4 class="alert-heading">Berhasil!</h4>
+            <h4 class="alert-heading"><i class="bi bi-check-circle me-2"></i>Berhasil!</h4>
             <p>Pesan tersembunyi telah berhasil diekstrak dan didekripsi dari file audio.</p>
         </div>
         
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Pesan Asli (Plaintext)</h5>
-                <span class="badge bg-secondary" id="charCount">0 karakter</span>
+                <div>
+                    <i class="bi bi-chat-text me-2"></i>Pesan Asli (Plaintext)
+                </div>
+                <span class="badge bg-primary" id="charCount">0 karakter</span>
             </div>
             <div class="card-body">
-                <div class="border p-3 rounded bg-light mb-3" style="white-space: pre-wrap; word-break: break-word;">{{ decrypted_text }}</div>
+                <div class="border p-3 rounded mb-3" style="white-space: pre-wrap; word-break: break-word; background-color: var(--darker-bg);">{{ decrypted_text }}</div>
                 
-                <button class="btn btn-sm btn-secondary" onclick="copyToClipboard()">
-                    <i class="bi bi-clipboard"></i> Salin ke Clipboard
+                <button class="btn btn-outline-primary" onclick="copyToClipboard()">
+                    <i class="bi bi-clipboard me-1"></i> Salin ke Clipboard
                 </button>
             </div>
         </div>
         
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>Informasi Dekripsi</h5>
+        <div class="data-card mb-4">
+            <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>Informasi Dekripsi</strong>
             </div>
-            <div class="card-body">
-                <dl class="row">
-                    <dt class="col-sm-3">Kunci Dekripsi:</dt>
-                    <dd class="col-sm-9">{{ key }}</dd>
-                    
-                    {% if timestamp %}
-                    <dt class="col-sm-3">Waktu Dekripsi:</dt>
-                    <dd class="col-sm-9">{{ timestamp }}</dd>
-                    {% endif %}
-                    
-                    <dt class="col-sm-3">Jumlah Karakter:</dt>
-                    <dd class="col-sm-9">{{ decrypted_text|length }} karakter</dd>
-                </dl>
+            
+            <div class="row">
+                <div class="col-sm-3 mb-2">
+                    <div class="text-muted">Kunci Dekripsi:</div>
+                </div>
+                <div class="col-sm-9 mb-2">
+                    <div class="bg-dark p-2 rounded text-warning fw-bold">{{ key }}</div>
+                </div>
+                
+                {% if chord_positions %}
+                <div class="col-sm-3 mb-2">
+                    <div class="text-muted">Posisi Chord:</div>
+                </div>
+                <div class="col-sm-9 mb-2">
+                    <div class="bg-dark p-2 rounded text-warning fw-bold">{{ chord_positions }}</div>
+                </div>
+                {% endif %}
+                
+                {% if timestamp %}
+                <div class="col-sm-3 mb-2">
+                    <div class="text-muted">Waktu Dekripsi:</div>
+                </div>
+                <div class="col-sm-9 mb-2">
+                    <div class="p-2">{{ timestamp }}</div>
+                </div>
+                {% endif %}
+                
+                <div class="col-sm-3 mb-2">
+                    <div class="text-muted">Jumlah Karakter:</div>
+                </div>
+                <div class="col-sm-9 mb-2">
+                    <div class="p-2">{{ decrypted_text|length }} karakter</div>
+                </div>
             </div>
         </div>
         
         <div class="d-flex justify-content-between">
-            <a href="{{ url_for('decrypt') }}" class="btn btn-primary">Dekripsi File Lain</a>
-            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Kembali ke Beranda</a>
+            <a href="{{ url_for('decrypt') }}" class="btn btn-primary">
+                <i class="bi bi-unlock me-1"></i> Dekripsi File Lain
+            </a>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-house me-1"></i> Kembali ke Beranda
+            </a>
         </div>
     </div>
 </div>
@@ -56,7 +84,14 @@
 function copyToClipboard() {
     const text = document.querySelector('.card-body .border').innerText;
     navigator.clipboard.writeText(text).then(function() {
-        alert('Pesan berhasil disalin!');
+        const copyBtn = document.querySelector('.btn-outline-primary');
+        copyBtn.innerHTML = '<i class="bi bi-check-lg"></i> Tersalin';
+        copyBtn.classList.replace('btn-outline-primary', 'btn-success');
+        
+        setTimeout(function() {
+            copyBtn.innerHTML = '<i class="bi bi-clipboard me-1"></i> Salin ke Clipboard';
+            copyBtn.classList.replace('btn-success', 'btn-outline-primary');
+        }, 2000);
     }, function(err) {
         alert('Gagal menyalin pesan: ' + err);
     });

@@ -2,58 +2,84 @@
 
 {% block content %}
 <div class="card">
-    <div class="card-header">
-        <h2>Enkripsi Pesan</h2>
+    <div class="card-header d-flex align-items-center">
+        <i class="bi bi-lock me-2"></i>
+        Enkripsi Pesan
     </div>
     <div class="card-body">
-        <p class="mb-4">Masukkan pesan yang ingin dienkripsi dan kunci enkripsi. Pesan akan dienkripsi dengan AES dan disembunyikan dalam file audio.</p>
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <p class="mb-0">Masukkan pesan yang ingin dienkripsi dan kunci untuk disembunyikan dalam file audio.</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <span class="badge bg-primary">AES-128</span>
+            </div>
+        </div>
         
         <!-- Progress bar (awalnya disembunyikan) -->
         <div id="progressContainer" class="mb-4 d-none">
-            <h5 class="mb-3">Proses Enkripsi Sedang Berjalan...</h5>
+            <h5 class="mb-3 gradient-text">Proses Enkripsi</h5>
             
             <div class="d-flex justify-content-between mb-1">
                 <span id="progressPercent">0%</span>
                 <span id="progressTime">00:00</span>
             </div>
             
-            <div class="progress" style="height: 25px;">
+            <div class="progress">
                 <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
                      role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" 
                      style="width: 0%"></div>
             </div>
             <p id="progressStatus" class="mt-2 text-center">Memulai proses enkripsi...</p>
-            <p class="text-muted text-center small mt-2">Proses ini bisa memakan waktu beberapa menit untuk pesan yang panjang.<br>Mohon jangan tutup halaman ini.</p>
+            <p class="text-muted text-center small">Mohon jangan tutup halaman ini.</p>
         </div>
         
         <form id="encryptForm" method="POST" action="{{ url_for('encrypt') }}">
-            <div class="mb-3">
-                <label for="plaintext" class="form-label">Pesan (Plaintext)</label>
-                <textarea class="form-control" id="plaintext" name="plaintext" rows="5" required></textarea>
-                <div class="d-flex justify-content-between">
-                    <div class="form-text">Masukkan pesan yang ingin dienkripsi dan disembunyikan.</div>
-                    <div class="form-text" id="charCount">0 karakter</div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label for="plaintext" class="form-label">
+                            <i class="bi bi-chat-text"></i> Pesan
+                        </label>
+                        <textarea class="form-control" id="plaintext" name="plaintext" rows="5" required></textarea>
+                        <div class="d-flex justify-content-between">
+                            <div class="form-text">Masukkan pesan yang ingin dienkripsi</div>
+                            <div class="form-text" id="charCount">0 karakter</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-text text-muted">
-                    <i class="bi bi-info-circle"></i> Rekomendasi: maksimum 2000-5000 karakter untuk hasil optimal.
+                
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="key" class="form-label">
+                            <i class="bi bi-key"></i> Kunci Enkripsi
+                        </label>
+                        <input type="text" class="form-control" id="key" name="key" required minlength="16" maxlength="16">
+                        <div class="form-text">16 karakter</div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <div class="small">
+                            Ingat kunci yang digunakan. Diperlukan untuk dekripsi.
+                        </div>
+                    </div>
+                    
+                    <div class="data-card">
+                        <div class="mb-1 text-muted small">Rekomendasi</div>
+                        <div class="small">
+                            Maksimal 5000 karakter
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <div class="mb-3">
-                <label for="key" class="form-label">Kunci Enkripsi</label>
-                <input type="text" class="form-control" id="key" name="key" required minlength="16" maxlength="16">
-                <div class="form-text">Kunci harus tepat 16 karakter. Ingat baik-baik, kunci yang sama diperlukan untuk dekripsi.</div>
-            </div>
-            
-            <div class="mb-3">
-                <div class="alert alert-info">
-                    <strong>Catatan:</strong> Proses enkripsi dan pembuatan audio mungkin memerlukan waktu beberapa detik hingga menit tergantung panjang pesan.
-                </div>
-            </div>
-            
-            <div class="d-grid gap-2">
-                <button type="submit" id="submitBtn" class="btn btn-primary">Enkripsi & Buat Audio</button>
-                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">Kembali</a>
+            <div class="d-flex justify-content-between mt-3">
+                <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Kembali
+                </a>
+                <button type="submit" id="submitBtn" class="btn btn-primary">
+                    <i class="bi bi-lock"></i> Enkripsi
+                </button>
             </div>
         </form>
     </div>
@@ -79,10 +105,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Tambahkan warning class jika lebih dari 5000 karakter
         if (count > 5000) {
             charCount.classList.add('text-danger');
-            charCount.classList.add('fw-bold');
         } else {
             charCount.classList.remove('text-danger');
-            charCount.classList.remove('fw-bold');
         }
     }
     
@@ -113,9 +137,8 @@ document.addEventListener('DOMContentLoaded', function() {
             "Mengenkripsi pesan dengan kunci Anda...",
             "Mengkonversi data terenkripsi ke biner...",
             "Memetakan bit ke chord musik...",
-            "Membuat file audio dengan pola Mary Had a Little Lamb...",
-            "Menyimpan metadata ke dalam file audio...",
-            "Hampir selesai, sedang memproses audio akhir..."
+            "Membuat file audio...",
+            "Hampir selesai..."
         ];
         
         // Variabel untuk menghitung waktu
