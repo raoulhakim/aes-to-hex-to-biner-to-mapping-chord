@@ -5,8 +5,12 @@ import json
 import binascii
 import numpy as np
 import logging
+import hashlib
 from scipy.io import wavfile
 from Crypto.Cipher import AES
+
+# Impor silang untuk membuat fingerprint audio
+from app.utils.encrypt_utils import create_audio_fingerprint
 
 # Setup logging
 logger = logging.getLogger(__name__)
@@ -253,47 +257,71 @@ def extract_binary_from_exact_positions(chord_positions):
         logger.error(f"[EXTRACT_BINARY] ERROR saat ekstraksi biner: {str(e)}")
         raise ValueError(f"Error saat ekstraksi biner: {str(e)}")
 
-def extract_binary_from_audio(audio_path, chord_positions_str):
-    """Ekstrak data biner dari file audio steganografi menggunakan password kedua (posisi chord)."""
+def get_decrypted_hex_from_audio(audio_path, key, audio_key):
+    """
+    Mendekripsi file audio steganografi dengan verifikasi berlapis.
+    1. Verifikasi sidik jari akustik (Kunci Audio).
+    2. Baca metadata untuk mendapatkan posisi chord.
+    3. Ekstrak data biner.
+    4. Verifikasi fingerprint internal.
+    5. Kembalikan ciphertext hex jika semua valid.
+    """
     logger.info("\n" + "="*50)
-    logger.info(f"[EXTRACT_BINARY] Memulai ekstraksi biner dari file audio: {audio_path}")
-    
-    if not chord_positions_str or not chord_positions_str.strip():
-        logger.error(f"[EXTRACT_BINARY] ERROR: Posisi chord tidak disediakan")
-        raise ValueError("Posisi chord (password kedua) harus disediakan untuk dekripsi")
-    
+    logger.info("[DECRYPT_WORKFLOW] Memulai alur kerja dekripsi")
+    logger.info(f"[DECRYPT_WORKFLOW] File audio: {audio_path}")
+
+    # --- LANGKAH 1: Verifikasi Sidik Jari Akustik (Kunci Audio) ---
+    logger.info("[DECRYPT_WORKFLOW] Langkah 1: Memverifikasi Kunci Audio...")
     try:
-        logger.info(f"[EXTRACT_BINARY] Menggunakan posisi chord yang disediakan pengguna: {chord_positions_str}")
-        
-        # Parse input chord positions - MENGGUNAKAN URUTAN YANG SAMA PERSIS SEPERTI DARI ENKRIPSI
-        chord_positions = []
-        for pos in chord_positions_str.split(','):
-            pos = pos.strip()
-            if pos:  # Pastikan bukan string kosong
-                try:
-                    chord_positions.append(int(pos))
-                except ValueError:
-                    logger.warning(f"[EXTRACT_BINARY] PERINGATAN: Mengabaikan posisi tidak valid: {pos}")
-        
-        if not chord_positions:
-            logger.error(f"[EXTRACT_BINARY] ERROR: Tidak ada posisi chord yang valid")
-            raise ValueError("Tidak ada posisi chord yang valid ditemukan")
-        
-        # SANGAT PENTING: JANGAN urutkan chord positions, karena urutannya harus sama dengan saat enkripsi
-        logger.info(f"[EXTRACT_BINARY] Posisi chord yang akan digunakan (urutan asli dari enkripsi): {chord_positions}")
-        
-        # Ekstrak biner dari posisi chord - MENGGUNAKAN URUTAN YANG SAMA PERSIS
-        binary_sequence = extract_binary_from_exact_positions(chord_positions)
-        
-        # Konversi biner ke hex
-        hex_string = binary_to_hex(binary_sequence)
-        
-        logger.info(f"[EXTRACT_BINARY] Ekstraksi biner selesai, hasil hex: {hex_string}")
-        logger.info(f"[EXTRACT_BINARY] Panjang hex: {len(hex_string)} karakter")
-        logger.info("="*50 + "\n")
-        
-        return hex_string
+        calculated_audio_key = create_audio_fingerprint(audio_path)
+        if calculated_audio_key.lower() != audio_key.lower():
+            logger.error(f"[DECRYPT_WORKFLOW] Kunci Audio tidak cocok! Diharapkan: {audio_key}, Dihitung: {calculated_audio_key}")
+            raise ValueError("Kunci Audio tidak valid atau file audio telah diubah.")
+        logger.info("[DECRYPT_WORKFLOW] Kunci Audio berhasil diverifikasi.")
+    except Exception as e:
+        logger.error(f"[DECRYPT_WORKFLOW] Gagal memverifikasi Kunci Audio: {e}")
+        raise ValueError(f"Gagal memproses file audio: {e}")
+
+    # --- LANGKAH 2: Baca Metadata ---
+    logger.info("[DECRYPT_WORKFLOW] Langkah 2: Membaca file metadata...")
+    metadata_path = os.path.splitext(audio_path)[0] + '_metadata.json'
+    if not os.path.exists(metadata_path):
+        logger.error(f"[DECRYPT_WORKFLOW] File metadata tidak ditemukan: {metadata_path}")
+        raise FileNotFoundError("File metadata yang diperlukan untuk dekripsi tidak ditemukan.")
     
-    except ValueError as e:
-        logger.error(f"[EXTRACT_BINARY] ERROR saat parsing posisi chord: {str(e)}")
-        raise ValueError(f"Format posisi chord tidak valid: {str(e)}") 
+    with open(metadata_path, 'r') as f:
+        metadata = json.load(f)
+    
+    final_chord_positions_str = metadata.get('chord_positions')
+    expected_internal_fingerprint = metadata.get('internal_fingerprint')
+
+    # --- LANGKAH 3: Ekstrak Data Biner ---
+    logger.info("[DECRYPT_WORKFLOW] Langkah 3: Mengekstrak data biner dari posisi chord...")
+    try:
+        final_chord_positions = [int(p.strip()) for p in final_chord_positions_str.split(',') if p.strip()]
+        binary_sequence = extract_binary_from_exact_positions(final_chord_positions)
+    except Exception as e:
+        logger.error(f"[DECRYPT_WORKFLOW] Gagal mengekstrak biner dari posisi chord: {e}")
+        raise
+
+    # --- LANGKAH 4: Verifikasi Fingerprint Internal ---
+    logger.info("[DECRYPT_WORKFLOW] Langkah 4: Memverifikasi fingerprint internal...")
+    if len(binary_sequence) < 32:
+        raise ValueError("Data korup atau kunci salah. Gagal menemukan fingerprint internal.")
+        
+    extracted_fingerprint_binary = binary_sequence[:32]
+    ciphertext_binary = binary_sequence[32:]
+    extracted_fingerprint_hex = f'{int(extracted_fingerprint_binary, 2):08x}'
+
+    if extracted_fingerprint_hex.lower() != expected_internal_fingerprint.lower():
+        logger.error(f"[DECRYPT_WORKFLOW] Fingerprint internal tidak cocok! Diharapkan: {expected_internal_fingerprint}, Ditemukan: {extracted_fingerprint_hex}")
+        raise ValueError("Kunci AES (Password 1) salah.")
+        
+    logger.info("[DECRYPT_WORKFLOW] Verifikasi fingerprint internal berhasil.")
+    
+    # --- LANGKAH 5: Konversi Ciphertext ---
+    hex_string = binary_to_hex(ciphertext_binary)
+    logger.info(f"[DECRYPT_WORKFLOW] Ekstraksi selesai, ciphertext hex siap didekripsi.")
+    logger.info("="*50 + "\n")
+    
+    return hex_string 

@@ -39,19 +39,19 @@
                             <div class="text-danger"><strong>PENTING!</strong> Simpan kunci ini. Dibutuhkan untuk dekripsi.</div>
                         </div>
                         
-                        <div class="data-card mt-3">
+                        <div class="data-card">
                             <div class="d-flex align-items-center mb-2">
-                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
-                                <strong>Kunci Kedua (Posisi Chord):</strong>
+                                <i class="bi bi-music-note-list text-warning me-2"></i>
+                                <strong>Kunci Audio (Password 2):</strong>
                             </div>
                             <div class="input-group mb-2">
                                 <input type="text" class="form-control bg-dark text-warning fw-bold" 
-                                    value="{{ chord_positions }}" id="chord_positions" readonly>
-                                <button class="btn btn-warning" type="button" id="copyBtn">
+                                       value="{{ audio_key }}" id="audio_key" readonly>
+                                <button class="btn btn-warning" type="button" id="copyAudioKeyBtn">
                                     <i class="bi bi-clipboard"></i> Salin
                                 </button>
                             </div>
-                            <div class="text-danger"><strong>PENTING!</strong> Simpan kunci kedua ini. Dibutuhkan untuk dekripsi.</div>
+                            <div class="text-danger"><strong>PENTING!</strong> Simpan Kunci Audio ini. Dibutuhkan untuk dekripsi.</div>
                         </div>
                     </div>
                 </div>
@@ -95,60 +95,27 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Fungsi untuk menangani copy to clipboard
-    function handleCopy(buttonId, textId) {
-        document.getElementById(buttonId).addEventListener('click', function() {
-            var copyText = document.getElementById(textId);
-            copyText.select();
-            copyText.setSelectionRange(0, 99999); // Untuk mobile
-            
-            // Coba metode clipboard API modern
-            try {
-                // Metode clipboard API modern
-                navigator.clipboard.writeText(copyText.value).then(() => {
-                    showSuccess(this);
-                }).catch(err => {
-                    // Jika gagal, coba metode fallback
-                    fallbackCopy(copyText, this);
-                });
-            } catch (err) {
-                // Jika error terjadi pada clipboard API, gunakan fallback
-                fallbackCopy(copyText, this);
-            }
-        });
-    }
-    
-    // Metode fallback untuk browser yang tidak mendukung clipboard API
-    function fallbackCopy(copyText, button) {
-        try {
-            // Metode execCommand (lama)
-            var successful = document.execCommand('copy');
-            if (successful) {
-                showSuccess(button);
-            } else {
-                alert("Tidak dapat menyalin teks secara otomatis. Silakan salin secara manual.");
-            }
-        } catch(err) {
-            alert("Tidak dapat menyalin teks secara otomatis. Silakan salin secara manual.");
-            console.error('Fallback: Oops, tidak dapat menyalin', err);
+    function handleCopy(buttonId, inputId) {
+        const copyBtn = document.getElementById(buttonId);
+        const inputToCopy = document.getElementById(inputId);
+
+        if (copyBtn && inputToCopy) {
+            copyBtn.addEventListener('click', () => {
+                inputToCopy.select();
+                document.execCommand('copy');
+                
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="bi bi-check-lg"></i> Tersalin!';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            });
         }
     }
     
-    // Tampilkan indikator sukses pada tombol
-    function showSuccess(button) {
-        var originalHTML = button.innerHTML;
-        button.innerHTML = '<i class="bi bi-check-lg"></i> Tersalin';
-        button.classList.replace('btn-warning', 'btn-success');
-        
-        // Kembalikan tampilan setelah beberapa detik
-        setTimeout(() => {
-            button.innerHTML = originalHTML;
-            button.classList.replace('btn-success', 'btn-warning');
-        }, 2000);
-    }
-    
     // Panggil fungsi untuk kedua tombol
-    handleCopy('copyBtn', 'chord_positions');
+    handleCopy('copyAudioKeyBtn', 'audio_key');
     handleCopy('copyKeyBtn', 'encryption_key');
 });
 </script>

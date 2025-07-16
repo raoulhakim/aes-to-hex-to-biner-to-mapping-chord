@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 from datetime import datetime
 from app import app
 from app.utils.encrypt_utils import encrypt_aes, binary_to_audio
-from app.utils.decrypt_utils import decrypt_aes, extract_binary_from_audio
+from app.utils.decrypt_utils import decrypt_aes, get_decrypted_hex_from_audio
 import json
 import logging
 
@@ -45,21 +45,20 @@ def encrypt():
             # Enkripsi pesan
             ciphertext_hex = encrypt_aes(plaintext, key)
             
-            # Buat audio steganografi dan dapatkan chord positions
-            output_filename, decryption_key = binary_to_audio(ciphertext_hex, 
+            # Buat audio steganografi dan dapatkan Kunci Audio
+            output_filename, decryption_data = binary_to_audio(ciphertext_hex, 
+                                             key,
                                              app.config['UPLOAD_FOLDER'], 
                                              app.config['CHORD_FOLDER'])
             
-            # Ekstrak chord positions untuk password kedua
-            chord_positions = decryption_key.get("chord_positions", [])
-            chord_positions_str = ",".join(map(str, chord_positions))
+            # Ekstrak Kunci Audio untuk ditampilkan ke pengguna
+            audio_key = decryption_data.get("audio_key")
             
-            # Tampilkan hasil
             return render_template('encrypt_result.html', 
                                   title='Hasil Enkripsi',
                                   plaintext=plaintext,
                                   key=key,
-                                  chord_positions=chord_positions_str,
+                                  audio_key=audio_key,
                                   audio_file=output_filename)
                                   
         except Exception as e:
@@ -70,61 +69,58 @@ def encrypt():
 
 @app.route('/decrypt', methods=['GET', 'POST'])
 def decrypt():
-    """Halaman dekripsi audio."""
     if request.method == 'POST':
-        key = request.form.get('key', '')
-        chord_positions = request.form.get('chord_positions', '')
-        
-        # Validasi key
-        if not key or len(key) != 16:
-            flash('Kunci dekripsi harus tepat 16 karakter.', 'warning')
-            return redirect(url_for('decrypt'))
-            
-        # Validasi chord positions
-        if not chord_positions or chord_positions.strip() == '':
-            flash('Posisi chord (password kedua) harus diisi.', 'warning')
-            return redirect(url_for('decrypt'))
-            
-        # Memeriksa apakah file audio yang diunggah valid
         if 'audio_file' not in request.files:
-            flash('Tidak ada file yang diunggah.', 'warning')
-            return redirect(url_for('decrypt'))
-            
+            flash('Tidak ada file yang dipilih.', 'warning')
+            return redirect(request.url)
+        
         file = request.files['audio_file']
+        key = request.form.get('key')
+        audio_key = request.form.get('audio_key') # Kunci baru dari pengguna
         
         if file.filename == '':
             flash('Tidak ada file yang dipilih.', 'warning')
-            return redirect(url_for('decrypt'))
-            
-        if not allowed_file(file.filename):
-            flash('Hanya file WAV yang diizinkan.', 'warning')
-            return redirect(url_for('decrypt'))
-            
-        # Simpan file yang diunggah
-        filename = secure_filename(file.filename)
-        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(filepath)
+            return redirect(request.url)
         
+        if not all([file, key, audio_key]):
+            flash('Semua kolom (File Audio, Kunci AES, Kunci Audio) harus diisi.', 'warning')
+            return redirect(request.url)
+
         try:
-            # Ekstrak hex dari file audio (dengan chord positions yang diwajibkan)
-            hex_string = extract_binary_from_audio(filepath, chord_positions)
+            filename = secure_filename(file.filename)
+            audio_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(audio_path)
             
-            # Dekripsi hex
-            decrypted_text = decrypt_aes(hex_string, key)
+            # 1. Dapatkan ciphertext hex menggunakan alur verifikasi baru
+            ciphertext_hex = get_decrypted_hex_from_audio(audio_path, key, audio_key)
             
-            # Tampilkan hasil
-            return render_template('decrypt_result.html',
-                                  title='Hasil Dekripsi',
-                                  decrypted_text=decrypted_text,
-                                  key=key,
-                                  chord_positions=chord_positions,
-                                  timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-                                  
+            # 2. Dekripsi pesan dari ciphertext
+            decrypted_message = decrypt_aes(ciphertext_hex, key)
+            
+            # 3. Hapus file metadata setelah berhasil
+            metadata_path = os.path.splitext(audio_path)[0] + '_metadata.json'
+            if os.path.exists(metadata_path):
+                os.remove(metadata_path)
+            
+            # Mendapatkan timestamp saat ini
+            timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            
+            return render_template('decrypt_result.html', 
+                                   title='Hasil Dekripsi',
+                                   decrypted_text=decrypted_message,
+                                   key=key,
+                                   audio_key=audio_key,
+                                   timestamp=timestamp)
+
+        except (ValueError, FileNotFoundError) as e:
+            flash(f'Error dekripsi: {str(e)}', 'danger')
         except Exception as e:
-            flash(f'Error saat dekripsi: {str(e)}', 'danger')
-            return redirect(url_for('decrypt'))
-            
-    return render_template('decrypt.html', title='Dekripsi Audio')
+            flash(f'Terjadi error yang tidak terduga: {str(e)}', 'danger')
+        
+        # Jika terjadi error, alihkan kembali ke halaman dekripsi
+        return redirect(url_for('decrypt'))
+
+    return render_template('decrypt.html', title='Dekripsi')
 
 @app.route('/download/<filename>')
 def download_file(filename):
@@ -140,7 +136,7 @@ def about():
 
 # Rute untuk halaman admin log viewer
 @app.route('/admin/logs')
-def view_logs():
+def admin_logs():
     log_file = 'logs/app.log'
     
     # Periksa apakah file log ada
