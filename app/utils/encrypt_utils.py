@@ -6,6 +6,7 @@ import struct
 import wave
 import uuid
 import logging
+import base64
 from scipy.io import wavfile
 from Crypto.Cipher import AES
 import time
@@ -58,6 +59,10 @@ def encrypt_aes(plaintext, key):
     # Enkripsi
     ciphertext = cipher.encrypt(padded_text.encode())
     logger.info(f"[ENCRYPT_AES] Plaintext berhasil dienkripsi")
+    
+    # Tampilkan ciphertext dalam format base64
+    ciphertext_base64 = base64.b64encode(ciphertext).decode()
+    logger.info(f"[ENCRYPT_AES] Ciphertext (base64): {ciphertext_base64}")
     
     # Konversi ke hex
     ciphertext_hex = binascii.hexlify(ciphertext).decode()
