@@ -30,6 +30,47 @@ mary_had_a_little_lamb = [
     ("C", 1.1), ("D", 1.1), ("D", 1.1), ("E", 1.1), ("D", 1.1), ("C", 2.2)
 ]
 
+def read_metadata_from_wav(wav_path):
+    """Membaca metadata chord positions dari file WAV."""
+    logger.info("\n" + "="*50)
+    logger.info(f"[READ_METADATA] Membaca metadata dari file: {wav_path}")
+    
+    try:
+        # Buka file WAV untuk membaca
+        with open(wav_path, 'rb') as f:
+            # Baca seluruh file sebagai bytes
+            data = f.read()
+            
+        # Cari metadata dengan format LIST INFO 
+        list_pos = data.find(b'LIST')
+        if list_pos == -1:
+            logger.warning(f"[READ_METADATA] Metadata LIST tidak ditemukan di file WAV")
+            return None
+            
+        # Cari tag "sTeg" yang kita gunakan untuk chord positions
+        steg_pos = data.find(b'sTeg', list_pos)
+        if steg_pos == -1:
+            logger.warning(f"[READ_METADATA] Metadata 'sTeg' tidak ditemukan di file WAV")
+            return None
+            
+        # Panjang data metadata adalah 4 byte setelah tag
+        chunk_size = data[steg_pos+4]
+        
+        # Baca metadata string
+        metadata_value = data[steg_pos+8:steg_pos+8+chunk_size-4].decode('latin-1').strip('\0')
+        logger.info(f"[READ_METADATA] Metadata chord positions ditemukan: {metadata_value}")
+        
+        # Konversi string menjadi list integer
+        chord_positions = [int(pos) for pos in metadata_value.split(',') if pos.strip()]
+        
+        logger.info(f"[READ_METADATA] Chord positions berhasil dibaca dari metadata: {chord_positions}")
+        logger.info("="*50 + "\n")
+        
+        return chord_positions
+    except Exception as e:
+        logger.error(f"[READ_METADATA] Error saat membaca metadata: {str(e)}")
+        return None
+
 def binary_to_hex(binary_string):
     """Mengkonversi string biner ke string hex."""
     logger.info("\n" + "="*50)
@@ -253,27 +294,36 @@ def extract_binary_from_exact_positions(chord_positions):
         logger.error(f"[EXTRACT_BINARY] ERROR saat ekstraksi biner: {str(e)}")
         raise ValueError(f"Error saat ekstraksi biner: {str(e)}")
 
-def extract_binary_from_audio(audio_path, chord_positions_str):
+def extract_binary_from_audio(audio_path, chord_positions_str=None):
     """Ekstrak data biner dari file audio steganografi menggunakan password kedua (posisi chord)."""
     logger.info("\n" + "="*50)
     logger.info(f"[EXTRACT_BINARY] Memulai ekstraksi biner dari file audio: {audio_path}")
     
-    if not chord_positions_str or not chord_positions_str.strip():
-        logger.error(f"[EXTRACT_BINARY] ERROR: Posisi chord tidak disediakan")
-        raise ValueError("Posisi chord (password kedua) harus disediakan untuk dekripsi")
-    
     try:
-        logger.info(f"[EXTRACT_BINARY] Menggunakan posisi chord yang disediakan pengguna: {chord_positions_str}")
+        # Coba baca chord positions dari metadata file WAV terlebih dahulu
+        chord_positions_from_metadata = read_metadata_from_wav(audio_path)
         
-        # Parse input chord positions - MENGGUNAKAN URUTAN YANG SAMA PERSIS SEPERTI DARI ENKRIPSI
-        chord_positions = []
-        for pos in chord_positions_str.split(','):
-            pos = pos.strip()
-            if pos:  # Pastikan bukan string kosong
-                try:
-                    chord_positions.append(int(pos))
-                except ValueError:
-                    logger.warning(f"[EXTRACT_BINARY] PERINGATAN: Mengabaikan posisi tidak valid: {pos}")
+        if chord_positions_from_metadata:
+            logger.info(f"[EXTRACT_BINARY] Berhasil membaca posisi chord dari metadata file WAV")
+            chord_positions = chord_positions_from_metadata
+            chord_positions_str_from_file = ",".join(map(str, chord_positions))
+            logger.info(f"[EXTRACT_BINARY] Menggunakan posisi chord dari metadata file: {chord_positions_str_from_file}")
+        elif chord_positions_str and chord_positions_str.strip():
+            # Jika tidak ada di metadata, gunakan input user
+            logger.info(f"[EXTRACT_BINARY] Metadata tidak ditemukan, menggunakan posisi chord yang disediakan pengguna: {chord_positions_str}")
+            
+            # Parse input chord positions
+            chord_positions = []
+            for pos in chord_positions_str.split(','):
+                pos = pos.strip()
+                if pos:  # Pastikan bukan string kosong
+                    try:
+                        chord_positions.append(int(pos))
+                    except ValueError:
+                        logger.warning(f"[EXTRACT_BINARY] PERINGATAN: Mengabaikan posisi tidak valid: {pos}")
+        else:
+            logger.error(f"[EXTRACT_BINARY] ERROR: Tidak ada posisi chord yang tersedia (tidak ditemukan di metadata dan tidak disediakan pengguna)")
+            raise ValueError("Posisi chord (password kedua) tidak ditemukan. File audio tidak valid atau telah dimodifikasi.")
         
         if not chord_positions:
             logger.error(f"[EXTRACT_BINARY] ERROR: Tidak ada posisi chord yang valid")
@@ -295,5 +345,5 @@ def extract_binary_from_audio(audio_path, chord_positions_str):
         return hex_string
     
     except ValueError as e:
-        logger.error(f"[EXTRACT_BINARY] ERROR saat parsing posisi chord: {str(e)}")
-        raise ValueError(f"Format posisi chord tidak valid: {str(e)}") 
+        logger.error(f"[EXTRACT_BINARY] ERROR: {str(e)}")
+        raise ValueError(str(e)) 

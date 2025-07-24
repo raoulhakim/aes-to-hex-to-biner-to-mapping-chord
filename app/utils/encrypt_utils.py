@@ -405,6 +405,46 @@ def generate_music_from_prepared_song(song_pattern, chord_dir):
     except ValueError as e:
         raise ValueError(f"Error saat menggabungkan audio: {e}")
 
+def write_metadata_to_wav(wav_path, chord_positions):
+    """Menambahkan metadata chord positions ke file WAV."""
+    logger.info("\n" + "="*50)
+    logger.info(f"[WRITE_METADATA] Menambahkan metadata ke file: {wav_path}")
+    
+    try:
+        # Buka file WAV untuk menulis metadata
+        with wave.open(wav_path, 'rb') as wav_read:
+            # Baca parameter dari file asli
+            params = wav_read.getparams()
+            frames = wav_read.readframes(wav_read.getnframes())
+            
+        # Buat file WAV baru dengan metadata
+        with wave.open(wav_path, 'wb') as wav_write:
+            wav_write.setparams(params)
+            
+            # Tulis metadata untuk chord positions
+            metadata_key = "CHORD_POSITIONS"
+            metadata_value = ",".join(map(str, chord_positions))
+            
+            # Menambahkan metadata dalam format LIST INFO
+            metadata = f"LIST\0\0\0\0INFOsTeg{chr(len(metadata_value) + 4)}\0\0\0{metadata_value}\0"
+            metadata_size = len(metadata)
+            
+            # Perbaiki panjang LIST
+            metadata_bytes = bytearray(metadata.encode('latin-1'))
+            metadata_bytes[4:8] = struct.pack('<I', metadata_size - 8)
+            
+            # Tulis frames dan metadata
+            wav_write.writeframes(frames)
+            wav_write.writeframesraw(metadata_bytes)
+            
+        logger.info(f"[WRITE_METADATA] Metadata berhasil ditambahkan: {metadata_key}={metadata_value}")
+        logger.info("="*50 + "\n")
+        
+        return True
+    except Exception as e:
+        logger.error(f"[WRITE_METADATA] Error saat menulis metadata: {str(e)}")
+        return False
+
 def binary_to_audio(hex_string, output_dir="app/static/uploads", chord_dir="Chord"):
     """Fungsi utama untuk konversi hex ke audio steganografi."""
     logger.info("\n" + "="*50)
@@ -439,6 +479,10 @@ def binary_to_audio(hex_string, output_dir="app/static/uploads", chord_dir="Chor
     wavfile.write(output_path, sample_rate, audio_data)
     logger.info(f"[BINARY_TO_AUDIO] Audio berhasil disimpan ke: {output_path}")
     
+    # Tambahkan metadata chord positions ke file WAV
+    write_metadata_to_wav(output_path, chord_positions)
+    logger.info(f"[BINARY_TO_AUDIO] Metadata chord positions berhasil ditambahkan ke file WAV")
+    
     # Format kunci dekripsi yang dikembalikan ke routes.py
     decryption_key = {
         "chord_positions": chord_positions,
@@ -454,8 +498,8 @@ def binary_to_audio(hex_string, output_dir="app/static/uploads", chord_dir="Chor
     logger.info(f"[BINARY_TO_AUDIO] Nama file output: {output_filename}")
     logger.info("[BINARY_TO_AUDIO] Proses konversi hex ke audio steganografi selesai")
     logger.info(f"[BINARY_TO_AUDIO] Lagu Mary Had a Little Lamb diulang sebanyak {perulangan_count} kali")
-    logger.info(f"[BINARY_TO_AUDIO] PENTING: Password kedua (posisi chord): {chord_positions}")
-    logger.info("[BINARY_TO_AUDIO] Pastikan pengguna menyimpan posisi chord ini untuk dekripsi!")
+    logger.info(f"[BINARY_TO_AUDIO] PENTING: Password kedua (posisi chord) disimpan dalam metadata file WAV")
+    logger.info("[BINARY_TO_AUDIO] Pengguna tidak perlu menyimpan posisi chord secara manual")
     logger.info("="*50 + "\n")
     
     return output_filename, decryption_key 

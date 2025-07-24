@@ -50,19 +50,19 @@ def encrypt():
                                              app.config['UPLOAD_FOLDER'], 
                                              app.config['CHORD_FOLDER'])
             
-            # Ekstrak chord positions untuk password kedua
-            chord_positions = decryption_key.get("chord_positions", [])
-            chord_positions_str = ",".join(map(str, chord_positions))
+            # Log untuk debug
+            logging.info(f"Enkripsi berhasil: pesan={plaintext}, kunci={key}, file={output_filename}")
+            logging.info(f"Chord positions disimpan dalam metadata file: {decryption_key['chord_positions_str']}")
             
-            # Tampilkan hasil
+            # Tampilkan hasil (tanpa menampilkan chord positions ke user)
             return render_template('encrypt_result.html', 
                                   title='Hasil Enkripsi',
                                   plaintext=plaintext,
                                   key=key,
-                                  chord_positions=chord_positions_str,
                                   audio_file=output_filename)
                                   
         except Exception as e:
+            logging.error(f"Error saat enkripsi: {str(e)}")
             flash(f'Error saat enkripsi: {str(e)}', 'danger')
             return redirect(url_for('encrypt'))
             
@@ -73,16 +73,10 @@ def decrypt():
     """Halaman dekripsi audio."""
     if request.method == 'POST':
         key = request.form.get('key', '')
-        chord_positions = request.form.get('chord_positions', '')
         
         # Validasi key
         if not key or len(key) != 16:
             flash('Kunci dekripsi harus tepat 16 karakter.', 'warning')
-            return redirect(url_for('decrypt'))
-            
-        # Validasi chord positions
-        if not chord_positions or chord_positions.strip() == '':
-            flash('Posisi chord (password kedua) harus diisi.', 'warning')
             return redirect(url_for('decrypt'))
             
         # Memeriksa apakah file audio yang diunggah valid
@@ -106,21 +100,24 @@ def decrypt():
         file.save(filepath)
         
         try:
-            # Ekstrak hex dari file audio (dengan chord positions yang diwajibkan)
-            hex_string = extract_binary_from_audio(filepath, chord_positions)
+            # Ekstrak hex dari file audio (posisi chord akan dibaca dari metadata file)
+            hex_string = extract_binary_from_audio(filepath)
             
             # Dekripsi hex
             decrypted_text = decrypt_aes(hex_string, key)
+            
+            # Log untuk debug
+            logging.info(f"Dekripsi berhasil: file={filename}, kunci={key}")
             
             # Tampilkan hasil
             return render_template('decrypt_result.html',
                                   title='Hasil Dekripsi',
                                   decrypted_text=decrypted_text,
                                   key=key,
-                                  chord_positions=chord_positions,
                                   timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
                                   
         except Exception as e:
+            logging.error(f"Error saat dekripsi: {str(e)}")
             flash(f'Error saat dekripsi: {str(e)}', 'danger')
             return redirect(url_for('decrypt'))
             
