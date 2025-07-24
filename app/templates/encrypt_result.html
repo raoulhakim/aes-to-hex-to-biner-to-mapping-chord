@@ -3,33 +3,65 @@
 {% block content %}
 <div class="card">
     <div class="card-header">
-        <h2>Hasil Enkripsi</h2>
+        <i class="bi bi-shield-lock me-2"></i>
+        Hasil Enkripsi
     </div>
     <div class="card-body">
         <div class="alert alert-success mb-4">
-            <h4 class="alert-heading">Berhasil!</h4>
+            <h4 class="alert-heading"><i class="bi bi-check-circle me-2"></i>Berhasil!</h4>
             <p>Pesan telah berhasil dienkripsi dan disembunyikan dalam file audio.</p>
         </div>
         
         <div class="row mb-4">
-            <div class="col-md-6">
+            <div class="col-md-6 mb-3 mb-md-0">
                 <div class="card h-100">
-                    <div class="card-header">Detail Enkripsi</div>
+                    <div class="card-header">
+                        <i class="bi bi-shield-lock me-2"></i> Detail Enkripsi
+                    </div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Plaintext:</label>
-                            <div class="border p-2 rounded bg-light">{{ plaintext }}</div>
+                            <label class="form-label">Pesan (plaintext):</label>
+                            <div class="border p-2 rounded" style="background-color: var(--darker-bg);">{{ plaintext }}</div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Kunci Enkripsi:</label>
-                            <div class="border p-2 rounded bg-light">{{ key }}</div>
+                        
+                        <div class="data-card">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                <strong>Kunci Enkripsi:</strong>
+                            </div>
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control bg-dark text-warning fw-bold" 
+                                    value="{{ key }}" id="encryption_key" readonly>
+                                <button class="btn btn-warning" type="button" id="copyKeyBtn">
+                                    <i class="bi bi-clipboard"></i> Salin
+                                </button>
+                            </div>
+                            <div class="text-danger"><strong>PENTING!</strong> Simpan kunci ini. Dibutuhkan untuk dekripsi.</div>
+                        </div>
+                        
+                        <div class="data-card mt-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                <strong>Kunci Kedua (Posisi Chord):</strong>
+                            </div>
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control bg-dark text-warning fw-bold" 
+                                    value="{{ chord_positions }}" id="chord_positions" readonly>
+                                <button class="btn btn-warning" type="button" id="copyBtn">
+                                    <i class="bi bi-clipboard"></i> Salin
+                                </button>
+                            </div>
+                            <div class="text-danger"><strong>PENTING!</strong> Simpan kunci kedua ini. Dibutuhkan untuk dekripsi.</div>
                         </div>
                     </div>
                 </div>
             </div>
+            
             <div class="col-md-6">
                 <div class="card h-100">
-                    <div class="card-header">File Audio</div>
+                    <div class="card-header">
+                        <i class="bi bi-file-earmark-music me-2"></i> File Audio
+                    </div>
                     <div class="card-body d-flex flex-column">
                         <p>Pesan telah disembunyikan dalam file audio berikut:</p>
                         
@@ -42,7 +74,7 @@
                         
                         <div class="mt-auto">
                             <a href="{{ url_for('download_file', filename=audio_file) }}" class="btn btn-primary">
-                                <i class="bi bi-download"></i> Unduh File Audio
+                                <i class="bi bi-download me-1"></i> Unduh File Audio
                             </a>
                         </div>
                     </div>
@@ -50,15 +82,74 @@
             </div>
         </div>
         
-        <div class="alert alert-warning mb-4">
-            <h5>Penting!</h5>
-            <p class="mb-0">Simpan kunci enkripsi dengan aman. Kunci yang sama diperlukan untuk dekripsi pesan ini nantinya.</p>
-        </div>
-        
         <div class="d-flex justify-content-between">
-            <a href="{{ url_for('encrypt') }}" class="btn btn-secondary">Enkripsi Pesan Lain</a>
-            <a href="{{ url_for('index') }}" class="btn btn-outline-primary">Kembali ke Beranda</a>
+            <a href="{{ url_for('encrypt') }}" class="btn btn-secondary">
+                <i class="bi bi-plus-circle me-1"></i> Enkripsi Pesan Lain
+            </a>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-primary">
+                <i class="bi bi-house me-1"></i> Kembali ke Beranda
+            </a>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Fungsi untuk menangani copy to clipboard
+    function handleCopy(buttonId, textId) {
+        document.getElementById(buttonId).addEventListener('click', function() {
+            var copyText = document.getElementById(textId);
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // Untuk mobile
+            
+            // Coba metode clipboard API modern
+            try {
+                // Metode clipboard API modern
+                navigator.clipboard.writeText(copyText.value).then(() => {
+                    showSuccess(this);
+                }).catch(err => {
+                    // Jika gagal, coba metode fallback
+                    fallbackCopy(copyText, this);
+                });
+            } catch (err) {
+                // Jika error terjadi pada clipboard API, gunakan fallback
+                fallbackCopy(copyText, this);
+            }
+        });
+    }
+    
+    // Metode fallback untuk browser yang tidak mendukung clipboard API
+    function fallbackCopy(copyText, button) {
+        try {
+            // Metode execCommand (lama)
+            var successful = document.execCommand('copy');
+            if (successful) {
+                showSuccess(button);
+            } else {
+                alert("Tidak dapat menyalin teks secara otomatis. Silakan salin secara manual.");
+            }
+        } catch(err) {
+            alert("Tidak dapat menyalin teks secara otomatis. Silakan salin secara manual.");
+            console.error('Fallback: Oops, tidak dapat menyalin', err);
+        }
+    }
+    
+    // Tampilkan indikator sukses pada tombol
+    function showSuccess(button) {
+        var originalHTML = button.innerHTML;
+        button.innerHTML = '<i class="bi bi-check-lg"></i> Tersalin';
+        button.classList.replace('btn-warning', 'btn-success');
+        
+        // Kembalikan tampilan setelah beberapa detik
+        setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.classList.replace('btn-success', 'btn-warning');
+        }, 2000);
+    }
+    
+    // Panggil fungsi untuk kedua tombol
+    handleCopy('copyBtn', 'chord_positions');
+    handleCopy('copyKeyBtn', 'encryption_key');
+});
+</script>
 {% endblock %} 

@@ -1,15 +1,15 @@
 # Web Framework
-Flask==2.0.1
-Werkzeug==2.0.1
-Jinja2==3.0.1
+Flask
+Werkzeug
+Jinja2
 
 # Encryption
-pycryptodome==3.10.1
+pycryptodome
 
 # Audio Processing
-numpy==1.19.5
-scipy==1.5.4
-Pillow==8.2.0
+numpy
+scipy
+Pillow
 
 # Development Tools (opsional)
 # flask-debugtoolbar==0.11.0 

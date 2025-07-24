@@ -1,72 +1,125 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="jumbotron p-5 bg-light rounded-3 mb-4">
-    <h1 class="display-4">Noiseless Steganografi Audio dengan Enkripsi AES</h1>
-    <p class="lead">Sembunyikan pesan rahasia dalam file audio yang digenerate dengan aman menggunakan enkripsi AES dan template lagu "Mary Had a Little Lamb".</p>
-    <hr class="my-4">
-    <p>Pilih salah satu opsi di bawah untuk memulai:</p>
-    <div class="d-flex gap-2">
-        <a class="btn btn-primary btn-lg" href="{{ url_for('encrypt') }}">Enkripsi Pesan</a>
-        <a class="btn btn-secondary btn-lg" href="{{ url_for('decrypt') }}">Dekripsi Audio</a>
+<div class="jumbotron p-4 rounded-3 mb-4">
+    <h1 class="display-5 fw-semibold mb-3">Noiseless Steganografi Audio dengan <span class="gradient-text">AES</span></h1>
+    <p class="lead mb-4">Sembunyikan pesan rahasia dalam file audio yang digenerate menggunakan enkripsi AES dan template melodi "Mary Had a Little Lamb".</p>
+    <hr class="my-4 border-secondary">
+    <div class="d-flex gap-3">
+        <a class="btn btn-primary px-4 py-2" href="{{ url_for('encrypt') }}">
+            <i class="bi bi-lock me-1"></i> Enkripsi
+        </a>
+        <a class="btn btn-secondary px-4 py-2" href="{{ url_for('decrypt') }}">
+            <i class="bi bi-unlock me-1"></i> Dekripsi
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-3">
+        <div class="data-card">
+            <div class="mb-1 text-muted small">Keamanan</div>
+            <div class="value">AES-128</div>
+            <div class="label">Enkripsi pesan</div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-3">
+        <div class="data-card">
+            <div class="mb-1 text-muted small">Nada</div>
+            <div class="value">4</div>
+            <div class="label">Chord Musik</div>
+        </div>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-6">
-        <div class="card mb-4">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
             <div class="card-header">
-                <h5 class="mb-0">Enkripsi Pesan</h5>
+                <i class="bi bi-shield-lock me-2"></i>
+                Enkripsi Pesan
             </div>
             <div class="card-body">
-                <p>Enkripsi pesan teks dan sembunyikan dalam file audio yang digenerate.</p>
-                <p>Proses:</p>
-                <ol>
+                <p>Enkripsi pesan teks dan sembunyikan dalam file audio.</p>
+                <ol class="mb-3">
                     <li>Masukkan pesan teks</li>
                     <li>Masukkan kunci enkripsi (16 karakter)</li>
                     <li>Klik "Enkripsi & Buat Audio"</li>
                     <li>Unduh file audio yang dihasilkan</li>
                 </ol>
-                <a href="{{ url_for('encrypt') }}" class="btn btn-primary">Enkripsi Sekarang</a>
+                <a href="{{ url_for('encrypt') }}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-right"></i> Enkripsi Sekarang
+                </a>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card mb-4">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
             <div class="card-header">
-                <h5 class="mb-0">Dekripsi Audio</h5>
+                <i class="bi bi-shield-check me-2"></i>
+                Dekripsi Audio
             </div>
             <div class="card-body">
-                <p>Ekstrak dan dekripsi pesan tersembunyi dari file audio yang digenerate.</p>
-                <p>Proses:</p>
-                <ol>
+                <p>Ekstrak dan dekripsi pesan dari file audio.</p>
+                <ol class="mb-3">
                     <li>Unggah file audio yang berisi pesan</li>
                     <li>Masukkan kunci dekripsi yang sama</li>
                     <li>Klik "Dekripsi Audio"</li>
                     <li>Baca pesan hasil dekripsi</li>
                 </ol>
-                <a href="{{ url_for('decrypt') }}" class="btn btn-secondary">Dekripsi Sekarang</a>
+                <a href="{{ url_for('decrypt') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-right"></i> Dekripsi Sekarang
+                </a>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row mt-4">
+<div class="row mt-2">
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h5 class="mb-0">Tentang Noiseless Steganografi Audio</h5>
+                <i class="bi bi-info-circle me-2"></i>
+                Tentang Steganografi Audio
             </div>
             <div class="card-body">
-                <p>Aplikasi ini menggunakan metode noiseless steganografi audio untuk menyembunyikan pesan rahasia dalam file musik yang digenerate. Proses yang digunakan:</p>
-                <ol>
-                    <li>Pesan dienkripsi menggunakan algoritma AES dengan kunci 16 karakter.</li>
-                    <li>Hasil enkripsi dikonversi ke bentuk biner (urutan bit 0 dan 1).</li>
-                    <li>Setiap 2 bit dipetakan ke nada musik dalam lagu "Mary Had a Little Lamb".</li>
-                    <li>File audio dibuat dengan urutan nada musik sesuai pemetaan bit.</li>
-                    <li>Metadata pemetaan bit disimpan dalam file audio untuk dekripsi.</li>
-                </ol>
-                <p>Keunggulan metode ini adalah pesan tersembunyi dalam musik yang terdengar alami bebas dari noise dan tidak mencurigakan.</p>
+                <div class="row">
+                    <div class="col-md-7 mb-3">
+                        <p>Aplikasi ini menyembunyikan pesan rahasia dalam file musik yang dihasilkan:</p>
+                        <ul class="mb-3">
+                            <li>Pesan dienkripsi dengan AES-128</li>
+                            <li>Data dikonversi ke bentuk biner</li>
+                            <li>Setiap 2 bit dipetakan ke nada musik</li>
+                            <li>Pesan disimpan ke file audio</li>
+                        </ul>
+                        <a href="{{ url_for('about') }}" class="btn btn-sm btn-secondary">Pelajari Lebih Lanjut</a>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="p-3 rounded bg-dark">
+                            <div class="text-muted mb-2 small">Pemetaan Bit ke Nada</div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-light text-dark">00</span>
+                                <i class="bi bi-arrow-right mx-1"></i>
+                                <span class="badge bg-primary flex-fill text-center">Chord C</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-light text-dark">01</span>
+                                <i class="bi bi-arrow-right mx-1"></i>
+                                <span class="badge bg-info flex-fill text-center">Chord D</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-light text-dark">10</span>
+                                <i class="bi bi-arrow-right mx-1"></i>
+                                <span class="badge bg-success flex-fill text-center">Chord E</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-light text-dark">11</span>
+                                <i class="bi bi-arrow-right mx-1"></i>
+                                <span class="badge bg-warning flex-fill text-center">Chord G</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
