@@ -1,90 +1,132 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="card">
-    <div class="card-header bg-gradient-purple">
-        <h2><i class="bi bi-info-circle me-2"></i>Tentang Aplikasi</h2>
+<div class="homepage-hero">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1><i class="bi bi-info-circle me-2"></i>Tentang Aplikasi</h1>
+        </div>
     </div>
-    <div class="card-body">
-        <h4 class="mb-3 gradient-text">Noiseless Steganografi Audio dengan Enkripsi AES</h4>
-        
-        <div class="mb-4">
-            <h5><i class="bi bi-question-circle me-2"></i>Apa itu Steganografi?</h5>
-            <p>Steganografi adalah seni dan ilmu menyembunyikan pesan rahasia di dalam media lain sehingga keberadaan pesan tersebut tidak diketahui oleh pihak ketiga. Berbeda dengan kriptografi yang membuat pesan tidak dapat dibaca, steganografi menyembunyikan fakta bahwa komunikasi rahasia sedang terjadi.</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="feature-card">
+            <h3>Noiseless Steganografi Audio dengan Enkripsi AES</h3>
+            <p>
+                Steganografi adalah seni dan ilmu menyembunyikan pesan rahasia di dalam media lain sehingga keberadaan pesan tersebut tidak disadari oleh pihak yang tidak berwenang. Aplikasi ini menggunakan teknik steganografi audio yang dikombinasikan dengan enkripsi AES untuk menyembunyikan pesan dalam file audio WAV.
+            </p>
         </div>
-        
-        <div class="mb-4">
-            <h5><i class="bi bi-music-note-beamed me-2"></i>Steganografi Audio dalam Aplikasi Ini</h5>
-            <p>Aplikasi ini menggunakan steganografi audio dengan menggabungkan teknik enkripsi AES dan pemetaan data ke nada musik. Proses kerjanya:</p>
-            <ol>
-                <li>Pesan pengguna dienkripsi menggunakan algoritma AES-128 dengan kunci 16 karakter.</li>
-                <li>Ciphertext hasil enkripsi dikonversi ke representasi biner.</li>
-                <li>Setiap 2 bit dipetakan ke nada musik tertentu (00 = C, 01 = D, 10 = E, 11 = G).</li>
-                <li>Nada-nada tersebut disusun mengikuti pola lagu "Mary Had a Little Lamb" untuk menghasilkan musik yang alami.</li>
-                <li>Informasi pemetaan urutan chord disimpan sebagai password kedua untuk proses dekripsi.</li>
-                <li>Dilakukan rekontruksi berdasarkan urutan posisi chord yang telah ditentukan menjadi melodi lagu "Mary Had a Little Lamb".</li>
-            </ol>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="feature-card h-100">
+            <h3><i class="bi bi-question-circle me-2"></i>Apa itu Steganografi?</h3>
+            <p>
+                Steganografi adalah seni dan ilmu menyembunyikan pesan rahasia di dalam media lain sehingga keberadaan pesan tersebut tidak disadari oleh pihak yang tidak berwenang. Berbeda dengan kriptografi yang merahasiakan isi pesan, steganografi menyembunyikan keberadaan pesan itu sendiri.
+            </p>
+            <p>
+                Dalam aplikasi ini, kami menggunakan media audio sebagai pembawa (carrier) untuk menyembunyikan pesan terenkripsi. Pola musik "Mary Had a Little Lamb" digunakan sebagai dasar untuk menyisipkan data biner dari pesan terenkripsi.
+            </p>
         </div>
-        
-        <div class="mb-4">
-            <h5><i class="bi bi-soundwave me-2"></i>Apa itu Noiseless Steganografi?</h5>
-            <p>Noiseless Steganografi adalah pendekatan steganografi yang bertujuan menyembunyikan pesan tanpa menimbulkan "noise" atau perubahan yang mencolok pada media pembawa. Pada steganografi audio konvensional, pesan sering disembunyikan dengan memodifikasi bit-bit tertentu pada file audio, yang bisa menimbulkan noise atau distorsi yang dapat terdeteksi.</p>
-            <p>Pada aplikasi ini, konsep "noiseless" diterapkan dengan pendekatan yang berbeda:</p>
-            <ol>
-                <li><strong>Penggunaan Elemen Musikal</strong> - Alih-alih hanya mengubah bit-bit data, pesan dikonversi menjadi nada-nada musik yang natural mengikuti pola melodi yang sudah ditentukan pada program yaitu melodi lagu "Mary Had a Little Lamb".</li>
-                <li><strong>Struktur Musik yang Lengkap</strong> - Audio yang dihasilkan memiliki struktur musik lengkap sehingga terdengar seperti komposisi musik pada umumnya.</li>
-            </ol>
-            <p>Dengan pendekatan ini, file audio yang dihasilkan tidak hanya berfungsi sebagai media penyimpanan pesan rahasia, tetapi juga dapat dinikmati sebagai musik pada umumnya, menyamarkan keberadaan informasi tersembunyi di dalamnya.</p>
-        </div>
-        
-        <div class="mb-4">
-            <h5><i class="bi bi-award me-2"></i>Keunggulan Metode</h5>
-            <ul class="list-group">
-                <li class="list-group-item" style="background-color: var(--card-bg); border-color: var(--border-color);">
-                    <i class="bi bi-shield-lock text-primary me-2"></i>
-                    <strong>Keamanan Ganda</strong> - Kombinasi enkripsi AES dan steganografi.
-                </li>
-                <li class="list-group-item" style="background-color: var(--card-bg); border-color: var(--border-color);">
-                    <i class="bi bi-music-note text-primary me-2"></i>
-                    <strong>Hasil Alami</strong> - File audio yang dihasilkan adalah lagu yang dapat didengarkan secara normal.
-                </li>
-                <li class="list-group-item" style="background-color: var(--card-bg); border-color: var(--border-color);">
-                    <i class="bi bi-file-earmark-binary text-primary me-2"></i>
-                    <strong>Metadata Tersembunyi</strong> - Informasi dekripsi disimpan dalam file audio tanpa merusak kualitas.
-                </li>
-                <li class="list-group-item" style="background-color: var(--card-bg); border-color: var(--border-color);">
-                    <i class="bi bi-archive text-primary me-2"></i>
-                    <strong>Kapasitas Besar</strong> - Dapat menyimpan pesan yang cukup panjang dalam satu file audio.
-                </li>
-                <li class="list-group-item" style="background-color: var(--card-bg); border-color: var(--border-color);">
-                    <i class="bi bi-eye-slash text-primary me-2"></i>
-                    <strong>Anti-Deteksi</strong> - Sulit dideteksi sebagai steganografi karena hasilnya berupa musik yang natural dan tidak mengandung noise yang mencolok.
-                </li>
-                <li class="list-group-item" style="background-color: var(--card-bg); border-color: var(--border-color);">
-                    <i class="bi bi-palette text-primary me-2"></i>
-                    <strong>Estetika</strong> - Menghasilkan output yang memiliki nilai estetika sebagai karya musik, bukan hanya sekadar wadah pesan.
-                </li>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="feature-card h-100">
+            <h3><i class="bi bi-shield-lock me-2"></i>Enkripsi AES</h3>
+            <p>
+                Advanced Encryption Standard (AES) adalah algoritma kriptografi simetris yang diadopsi sebagai standar enkripsi oleh pemerintah AS. AES menggunakan kunci untuk mengenkripsi data plaintext menjadi ciphertext yang tidak dapat dibaca.
+            </p>
+            <p>
+                Aplikasi ini mengimplementasikan AES-128 dengan:
+            </p>
+            <ul>
+                <li>Kunci 16 karakter (128 bit)</li>
+                <li>Mode ECB (Electronic Codebook)</li>
+                <li>Padding PKCS#7</li>
             </ul>
+            <p>
+                Enkripsi AES digunakan untuk mengamankan pesan sebelum disembunyikan dalam file audio.
+            </p>
         </div>
-        
-        <div class="mb-4">
-            <h5><i class="bi bi-code-slash me-2"></i>Teknologi yang Digunakan</h5>
-            <div class="card" style="background-color: var(--darker-bg);">
-                <div class="card-body">
-                    <ul class="list-unstyled mb-0">
-                        <li><i class="bi bi-filetype-py text-primary me-2"></i>Python - Bahasa pemrograman utama</li>
-                        <li><i class="bi bi-diagram-3 text-primary me-2"></i>Flask - Framework web</li>
-                        <li><i class="bi bi-lock text-primary me-2"></i>PyCryptodome - Library kriptografi untuk enkripsi AES</li>
-                        <li><i class="bi bi-graph-up text-primary me-2"></i>SciPy & NumPy - Manipulasi dan pemrosesan audio</li>
-                        <li><i class="bi bi-bootstrap text-primary me-2"></i>Bootstrap - Framework CSS untuk antarmuka pengguna</li>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="feature-card">
+            <h3><i class="bi bi-music-note me-2"></i>Cara Kerja Steganografi Audio</h3>
+            <p>
+                Aplikasi ini menggunakan metode pemetaan bit ke nada musik. Setiap segmen 2-bit dari pesan terenkripsi dipetakan ke chord musik tertentu:
+            </p>
+            <div class="row mt-4">
+                <div class="col-md-6 offset-md-3">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr class="table-primary">
+                                <th class="text-center">Segmen Biner</th>
+                                <th class="text-center">Chord Musik</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center fw-bold">00</td>
+                                <td class="text-center">Chord C</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center fw-bold">01</td>
+                                <td class="text-center">Chord D</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center fw-bold">10</td>
+                                <td class="text-center">Chord E</td>
+                            </tr>
+                            <tr>
+                                <td class="text-center fw-bold">11</td>
+                                <td class="text-center">Chord G</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="mt-3">
+                <p>
+                    Nada-nada ini disusun mengikuti pola melodi "Mary Had a Little Lamb", sehingga file audio yang dihasilkan tetap terdengar natural. Posisi nada yang mengandung data pesan disimpan dalam metadata file audio untuk digunakan saat proses dekripsi.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <div class="feature-card">
+            <h3><i class="bi bi-code-slash me-2"></i>Teknologi yang Digunakan</h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <ul>
+                        <li>Python 3.x</li>
+                        <li>Flask (Web Framework)</li>
+                        <li>Pycryptodome (AES)</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <ul>
+                        <li>SciPy (Pemrosesan Audio)</li>
+                        <li>Bootstrap 5 (Frontend)</li>
+                        <li>JavaScript (UI Interaktif)</li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <ul>
+                        <li>Numpy (Manipulasi Data)</li>
+                        <li>WAV File Format</li>
+                        <li>HTML5 Audio API</li>
                     </ul>
                 </div>
             </div>
-        </div>
-        
-        <div class="alert alert-info mb-4">
-            <h5><i class="bi bi-exclamation-circle me-2"></i>Catatan Penting:</h5>
-            <p class="mb-0">Aplikasi ini dibuat untuk tujuan edukasi dan demonstrasi.</p>
         </div>
     </div>
 </div>

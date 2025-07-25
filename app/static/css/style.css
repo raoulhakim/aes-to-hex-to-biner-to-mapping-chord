@@ -1,28 +1,88 @@
-/* Custom styles for Steganografi Audio AES */
-
+/* Variabel untuk tema */
 :root {
-    --dark-bg: #1a1a25;
-    --darker-bg: #141420;
-    --card-bg: #202030;
-    --card-header: #1d1d2d;
+    /* Color palette berdasarkan gambar 2 (light) */
+    --palette-primary-light: #7e6ee2;
+    --palette-secondary-light: #5A8DEE;
+    --palette-accent-light: #3498db;
+    --palette-background-light: #F8F9FA;
+    --palette-card-light: #FFFFFF;
+    --palette-text-light: #333333;
+    --palette-border-light: #E6E8EB;
+    --palette-muted-light: #6E7785;
+    
+    /* Primary colors - menggunakan gradient ungu dari logo */
     --primary-color: #7e6ee2;
-    --primary-hover: #6355d0;
-    --secondary-color: #5b54c5;
-    --text-color: #f0f0f5;
-    --text-muted: rgba(240, 240, 245, 0.65);
-    --border-color: #2d2d40;
-    --input-bg: #1c1c2c;
-    --input-border: #2d2d40;
+    --primary-gradient: linear-gradient(90deg, #7e6ee2, #3498db);
+    --secondary-color: #6c757d;
+    
+    /* Success, danger, warning masih dipertahankan */
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    
+    /* Light theme berdasarkan gambar 2 */
+    --bg-color: #F3F3F3;
+    --text-color: #333333;
+    --card-bg: #FFFFFF;
+    --card-border: #E6E8EB;
+    --darker-bg: #ECEDF2;
+    --input-bg: #FFFFFF;
+    --input-border: #E6E8EB;
+    --header-bg: #FFFFFF;
+    --header-text: #333333;
+    --footer-bg: #F2F4F7;
+    --footer-text: #6E7785;
+    --card-title: #333333;
+    --card-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+    --navbar-bg: #FFFFFF;
+    --navbar-text: #333333;
+    --feature-card-bg: #FFFFFF;
+    --feature-title-color: #7e6ee2;
+    --feature-value-color: #7e6ee2;
+    --hero-bg: linear-gradient(to bottom right, #FFFFFF, #F8F9FA);
+    --card-info-bg: #F8F9FA;
+    --card-process-bg: #FFFFFF;
+    --light-muted-text: #6E7785;
+    --light-color: #F8F9FA;
+    --dark-color: #333333;
+}
+
+/* Dark theme berdasarkan gambar 1 */
+[data-theme="dark"] {
+    --bg-color: #222629;
+    --text-color: #F8F9FA;
+    --card-bg: #2c3335;
+    --card-border: #383A47;
+    --darker-bg: #1A1D1F;
+    --input-bg: #2c3335;
+    --input-border: #383A47;
+    --header-bg: #2c3335;
+    --header-text: #F8F9FA;
+    --footer-bg: #2c3335;
+    --footer-text: #A9ADC1;
+    --card-title: #F8F9FA;
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    --navbar-bg: #1A1D1F;
+    --navbar-text: #F8F9FA;
+    --feature-card-bg: linear-gradient(to bottom right, #2c3335, #353b3d);
+    --feature-title-color: #DADAE6;
+    --feature-value-color: #7e6ee2;
+    --hero-bg: linear-gradient(to bottom right, #2c3335, #222629);
+    --card-info-bg: #2c3335;
+    --muted-text: #A9ADC1;
+    --card-process-bg: #2c3335;
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 
 body {
-    background: linear-gradient(135deg, #24243e, #1f1f30);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    color: var(--text-color);
     font-family: 'Inter', sans-serif;
     background-attachment: fixed;
     font-weight: 400;
@@ -40,26 +100,75 @@ body {
     max-width: 1000px;
 }
 
-.card {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.25), 0 3px 6px rgba(0, 0, 0, 0.2);
-    margin-bottom: 1.5rem;
+/* Card dengan border gradient di atas */
+.card,
+.homepage-hero {
     background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
+    border-color: var(--card-border);
+    box-shadow: var(--card-shadow);
+    border-radius: 10px;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+    position: relative;
     overflow: hidden;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.25);
+.feature-card {
+    background: var(--card-process-bg);
+    border-color: var(--card-border);
+    box-shadow: var(--card-shadow);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 24px;
+    transition: all 0.3s ease;
+    height: 100%;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.info-card {
+    background-color: var(--card-info-bg);
+    border: none;
+    box-shadow: var(--card-shadow);
+    border-radius: 10px;
+    padding: 20px 24px;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Border gradient pada card */
+.card::before,
+.feature-card::before,
+.info-card::before,
+.homepage-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--primary-gradient);
+    z-index: 1;
+}
+
+/* Top gradient border untuk light mode */
+[data-theme="light"] .feature-card::before,
+[data-theme="light"] .info-card::before,
+[data-theme="light"] .homepage-hero::before,
+.feature-card::before,
+.info-card::before,
+.homepage-hero::before {
+    height: 4px; /* Sedikit lebih tebal di light mode */
 }
 
 .card-header {
-    background-color: var(--card-header);
-    border-bottom: 1px solid var(--border-color);
-    color: var(--text-color);
-    padding: 0.75rem 1rem;
+    background-color: var(--header-bg);
+    color: var(--header-text);
+    border-bottom: 1px solid var(--card-border);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding: 16px 20px;
 }
 
 .jumbotron {
@@ -105,26 +214,39 @@ body {
 
 /* Navbar styling */
 .navbar {
-    background-color: var(--darker-bg) !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    padding: 0.6rem 1rem;
-    border-bottom: 1px solid var(--border-color);
+    background-color: var(--navbar-bg) !important;
+    transition: background-color 0.3s ease;
+    padding: 12px 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.navbar-dark .navbar-nav .nav-link {
-    color: var(--text-muted);
-    font-weight: 400;
+.navbar-dark .navbar-nav .nav-link,
+.navbar-dark .nav-link,
+.navbar-dark .navbar-brand {
+    color: var(--navbar-text) !important;
 }
 
-.navbar-dark .navbar-nav .nav-link:hover,
-.navbar-dark .navbar-nav .nav-link.active {
-    color: var(--primary-color);
+.navbar-light .navbar-nav .nav-link,
+.navbar-light .nav-link,
+.navbar-light .navbar-brand {
+    color: var(--navbar-text) !important;
+}
+
+.navbar-dark .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.55)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+.navbar-light .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0, 0, 0, 0.55)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
 }
 
 /* Gradient Text */
 .gradient-text {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
     color: var(--primary-color);
-    font-weight: 500;
 }
 
 .jumbotron .gradient-text {
@@ -148,7 +270,7 @@ audio {
 /* Form styling */
 .form-control, .form-select {
     background-color: var(--input-bg);
-    border-color: var(--input-border);
+    border-color: #9d9d9d;
     color: var(--text-color);
     border-radius: 0.25rem;
     padding: 0.5rem 0.75rem;
@@ -176,15 +298,13 @@ audio {
 }
 
 .btn-primary {
-    background: var(--primary-color);
-    border: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
 }
 
 .btn-primary:hover {
-    background: var(--primary-hover);
-    border: none;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    background-color: #6355d0;
+    border-color: #6355d0;
 }
 
 .jumbotron .btn-primary {
@@ -298,8 +418,9 @@ audio {
 }
 
 .app-logo {
-    height: 30px;
-    width: auto;
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
 }
 
 /* Log viewer */
@@ -391,6 +512,7 @@ textarea.form-control {
 h1, h2, h3, h4, h5, h6 {
     font-weight: 500;
     margin-bottom: 0.5rem;
+    color: var(--card-title);
 }
 
 /* Lists */
@@ -436,4 +558,173 @@ li {
 
 .list-group-item {
     color: #fff !important;
+} 
+
+/* Theme Switch Toggle */
+.theme-switch-wrapper {
+    display: flex;
+    align-items: center;
+    margin-right: 1rem;
+}
+
+.theme-switch {
+    display: inline-block;
+    height: 24px;
+    position: relative;
+    width: 48px;
+}
+
+.theme-switch input {
+    display: none;
+}
+
+.slider {
+    background-color: #ccc;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    background-color: white;
+    bottom: 4px;
+    content: "";
+    height: 16px;
+    left: 4px;
+    position: absolute;
+    transition: .4s;
+    width: 16px;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+.theme-icon {
+    margin-right: 8px;
+    font-size: 1.2rem;
+} 
+
+/* For main page feature cards */
+.feature-card {
+    background: var(--feature-card-bg);
+    border-color: var(--card-border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 24px;
+    transition: all 0.3s ease;
+    height: 100%;
+    width: 100%;
+}
+
+.feature-card h3 {
+    color: var(--feature-title-color);
+    margin-bottom: 15px;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.feature-card .feature-value {
+    color: var(--feature-value-color);
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.homepage-hero {
+    background: var(--hero-bg);
+    border-radius: 10px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.homepage-hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    color: var(--card-title);
+}
+
+.homepage-hero p {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+} 
+
+/* Info Card Style - seperti pada gambar */
+.info-card {
+    background-color: var(--card-info-bg);
+    border: none;
+    border-radius: 10px;
+    padding: 20px 24px;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.info-card .card-label {
+    color: var(--muted-text);
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.info-card .card-value {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+.info-card .card-description {
+    color: var(--muted-text);
+    font-size: 0.85rem;
+    opacity: 0.8;
+} 
+
+/* Adjust text color for light mode */
+[data-theme="light"] .info-card .card-label,
+[data-theme="light"] .card-description,
+[data-theme="light"] .text-muted {
+    color: var(--light-muted-text) !important;
+}
+
+/* Border untuk card gabungan */
+.border-end-md {
+    position: relative;
+}
+
+@media (min-width: 768px) {
+    .border-end-md {
+        border-right: 1px solid var(--card-border);
+        padding-right: 1.5rem;
+    }
+    
+    .border-end-md + div {
+        padding-left: 1.5rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .border-end-md {
+        border-bottom: 1px solid var(--card-border);
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .border-end-md + div {
+        padding-top: 0.5rem;
+    }
 } 

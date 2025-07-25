@@ -23,7 +23,7 @@ def allowed_file(filename):
 @app.route('/')
 def index():
     """Halaman utama aplikasi."""
-    return render_template('index.html', title='Steganografi Audio AES')
+    return render_template('index.html', title='Steganografi Audio AES', now=datetime.now())
 
 @app.route('/encrypt', methods=['GET', 'POST'])
 def encrypt():
@@ -59,14 +59,15 @@ def encrypt():
                                   title='Hasil Enkripsi',
                                   plaintext=plaintext,
                                   key=key,
-                                  audio_file=output_filename)
+                                  audio_file=output_filename,
+                                  now=datetime.now())
                                   
         except Exception as e:
             logging.error(f"Error saat enkripsi: {str(e)}")
             flash(f'Error saat enkripsi: {str(e)}', 'danger')
             return redirect(url_for('encrypt'))
             
-    return render_template('encrypt.html', title='Enkripsi Pesan')
+    return render_template('encrypt.html', title='Enkripsi Pesan', now=datetime.now())
 
 @app.route('/decrypt', methods=['GET', 'POST'])
 def decrypt():
@@ -114,14 +115,15 @@ def decrypt():
                                   title='Hasil Dekripsi',
                                   decrypted_text=decrypted_text,
                                   key=key,
-                                  timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                                  timestamp=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                                  now=datetime.now())
                                   
         except Exception as e:
             logging.error(f"Error saat dekripsi: {str(e)}")
             flash(f'Error saat dekripsi: {str(e)}', 'danger')
             return redirect(url_for('decrypt'))
             
-    return render_template('decrypt.html', title='Dekripsi Audio')
+    return render_template('decrypt.html', title='Dekripsi Audio', now=datetime.now())
 
 @app.route('/download/<filename>')
 def download_file(filename):
@@ -133,7 +135,7 @@ def download_file(filename):
 @app.route('/about')
 def about():
     """Halaman informasi tentang aplikasi."""
-    return render_template('about.html', title='Tentang Aplikasi')
+    return render_template('about.html', title='Tentang Aplikasi', now=datetime.now())
 
 # Rute untuk halaman admin log viewer
 @app.route('/admin/logs')
@@ -155,4 +157,4 @@ def view_logs():
     except Exception as e:
         logs = [f"Error membaca log: {str(e)}"]
     
-    return render_template('admin_logs.html', logs=logs) 
+    return render_template('admin_logs.html', logs=logs, title='Log Admin', now=datetime.now()) 
