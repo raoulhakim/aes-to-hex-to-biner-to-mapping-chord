@@ -22,6 +22,7 @@
                         <div class="mb-3">
                             <label class="form-label">Pesan Asli:</label>
                             <div class="border p-2 rounded" style="background-color: var(--darker-bg);">{{ decrypted_text }}</div>
+                            <div class="small text-muted mt-1">Jumlah karakter: {{ decrypted_text|length }}</div>
                         </div>
                         
                         <div class="mb-3">
@@ -40,11 +41,13 @@
                     <div class="card-body">
                         <p>Pesan tersebut berhasil didekripsi menggunakan kunci berikut:</p>
                         
-                        <div class="data-card">
-                            <strong>Password AES:</strong>
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control bg-dark text-light" 
-                                     value="{{ key }}" readonly>
+                        <div class="encryption-key-card">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                <strong>Kunci Dekripsi:</strong>
+                            </div>
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control" value="{{ key }}" id="decryption_key" readonly>
                             </div>
                         </div>
                         

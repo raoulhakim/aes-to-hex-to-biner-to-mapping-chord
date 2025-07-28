@@ -355,15 +355,51 @@ audio {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* Tombol outline sekunder yang lebih kontras dan konsisten di kedua tema */
 .btn-outline-secondary {
-    color: var(--text-muted);
-    border-color: var(--border-color);
+    background: #fff;
+    color: #7e6ee2;
+    border: 1.5px solid #bdbdbd;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(126, 110, 226, 0.07);
+    transition: background 0.2s, color 0.2s, border 0.2s;
+    fill: #7e6ee2;
 }
-
-.btn-outline-secondary:hover {
-    background-color: var(--darker-bg);
-    color: var(--text-color);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.btn-outline-secondary i,
+.btn-outline-secondary svg {
+    color: #7e6ee2 !important;
+    fill: #7e6ee2 !important;
+}
+.btn-outline-secondary:hover, .btn-outline-secondary:focus {
+    background: #f3f3fa;
+    color: #5f63f2;
+    border-color: #7e6ee2;
+}
+.btn-outline-secondary:hover i,
+.btn-outline-secondary:focus i,
+.btn-outline-secondary:hover svg,
+.btn-outline-secondary:focus svg {
+    color: #5f63f2 !important;
+    fill: #5f63f2 !important;
+}
+[data-theme="dark"] .btn-outline-secondary {
+    background: #23243a;
+    color: #dadada;
+    border: 1.5px solid #383a47;
+    fill: #dadada;
+}
+[data-theme="dark"] .btn-outline-secondary:hover, [data-theme="dark"] .btn-outline-secondary:focus {
+    background: #2c3335;
+    color: #7e6ee2;
+    border-color: #7e6ee2;
+    fill: #7e6ee2;
+}
+[data-theme="dark"] .btn-outline-secondary:hover i,
+[data-theme="dark"] .btn-outline-secondary:focus i,
+[data-theme="dark"] .btn-outline-secondary:hover svg,
+[data-theme="dark"] .btn-outline-secondary:focus svg {
+    color: #7e6ee2 !important;
+    fill: #7e6ee2 !important;
 }
 
 /* Alerts */
@@ -727,4 +763,43 @@ input:checked + .slider:before {
     .border-end-md + div {
         padding-top: 0.5rem;
     }
+} 
+
+/* Card kunci enkripsi (responsif tema) */
+.encryption-key-card {
+    background: var(--card-bg);
+    color: var(--text-color);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--card-border);
+}
+[data-theme="light"] .encryption-key-card {
+    background: #fff;
+    color: #333;
+}
+[data-theme="dark"] .encryption-key-card {
+    background: #23243a;
+    color: #f8f9fa;
+}
+.encryption-key-card .form-control {
+    background: #f4f4f4;
+    color: #222;
+    border: none;
+}
+[data-theme="dark"] .encryption-key-card .form-control {
+    background: #181a2b;
+    color: #fff;
+}
+.encryption-key-card .btn-warning {
+    color: #222;
+    background: #ffd600;
+    border: none;
+}
+.encryption-key-card .btn-warning:hover {
+    background: #ffb300;
+}
+.encryption-key-card .text-danger {
+    color: #d32f2f !important;
 } 
