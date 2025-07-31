@@ -53,11 +53,11 @@ def read_metadata_from_wav(wav_path):
             logger.warning(f"[READ_METADATA] Metadata 'sTeg' tidak ditemukan di file WAV")
             return None
             
-        # Panjang data metadata adalah 4 byte setelah tag
-        chunk_size = data[steg_pos+4]
+        # Panjang data metadata adalah 4 byte setelah tag (little-endian)
+        chunk_size = struct.unpack('<I', data[steg_pos+4:steg_pos+8])[0]
         
         # Baca metadata string
-        metadata_value = data[steg_pos+8:steg_pos+8+chunk_size-4].decode('latin-1').strip('\0')
+        metadata_value = data[steg_pos+8:steg_pos+8+chunk_size-4].decode('utf-8').strip('\0')
         logger.info(f"[READ_METADATA] Metadata chord positions ditemukan: {metadata_value}")
         
         # Konversi string menjadi list integer

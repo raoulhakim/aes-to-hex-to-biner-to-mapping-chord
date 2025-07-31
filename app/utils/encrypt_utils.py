@@ -431,12 +431,25 @@ def write_metadata_to_wav(wav_path, chord_positions):
             metadata_value = ",".join(map(str, chord_positions))
             
             # Menambahkan metadata dalam format LIST INFO
-            metadata = f"LIST\0\0\0\0INFOsTeg{chr(len(metadata_value) + 4)}\0\0\0{metadata_value}\0"
-            metadata_size = len(metadata)
+            # Gunakan bytes langsung untuk menghindari masalah encoding
+            list_header = b"LIST"
+            info_header = b"INFO"
+            steg_tag = b"sTeg"
             
-            # Perbaiki panjang LIST
-            metadata_bytes = bytearray(metadata.encode('latin-1'))
-            metadata_bytes[4:8] = struct.pack('<I', metadata_size - 8)
+            # Hitung ukuran metadata
+            metadata_size = len(metadata_value.encode('utf-8')) + 4
+            size_bytes = struct.pack('<I', metadata_size)
+            
+            # Buat metadata bytes
+            metadata_bytes = (
+                list_header + 
+                struct.pack('<I', metadata_size + 8) +  # Total LIST size
+                info_header + 
+                steg_tag + 
+                size_bytes + 
+                metadata_value.encode('utf-8') + 
+                b'\0'  # Null terminator
+            )
             
             # Tulis frames dan metadata
             wav_write.writeframes(frames)
