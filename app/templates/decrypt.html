@@ -9,7 +9,7 @@
     <div class="card-body">
         <div class="alert alert-info">
             <h5 class="alert-heading"><i class="bi bi-info-circle me-2"></i>Instruksi:</h5>
-            <p>Untuk melakukan dekripsi, silakan upload file audio steganografi dan masukkan kunci AES (16 karakter).</p>
+            <p>Untuk melakukan dekripsi, silakan upload file audio steganografi, masukkan password AES (16 karakter), dan password urutan chord.</p>
         </div>
         
         <form action="{{ url_for('decrypt') }}" method="post" enctype="multipart/form-data">
@@ -23,11 +23,20 @@
             
             <div class="mb-3">
                 <label for="key" class="form-label">
-                    <i class="bi bi-key me-1"></i> Kunci Dekripsi (AES):
+                    <i class="bi bi-key me-1"></i> Password AES:
                 </label>
                 <input type="password" class="form-control" id="key" name="key" required 
-                       minlength="16" maxlength="16" placeholder="Masukkan kunci 16 karakter">
-                <div class="form-text">Kunci AES harus tepat 16 karakter yang sama dengan yang digunakan saat enkripsi.</div>
+                       minlength="16" maxlength="16" placeholder="Masukkan password AES 16 karakter">
+                <div class="form-text">Password AES harus tepat 16 karakter yang sama dengan yang digunakan saat enkripsi.</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="chord_positions" class="form-label">
+                    <i class="bi bi-music-note me-1"></i> Password Urutan Chord:
+                </label>
+                <input type="text" class="form-control" id="chord_positions" name="chord_positions" required 
+                       placeholder="Masukkan urutan chord (contoh: 1,2,3,4,5)">
+                <div class="form-text">Password urutan chord yang diberikan saat enkripsi (format: angka dipisahkan koma).</div>
             </div>
             
             <div class="d-flex justify-content-between">

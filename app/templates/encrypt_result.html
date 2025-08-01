@@ -27,15 +27,30 @@
                         <div class="encryption-key-card">
                             <div class="d-flex align-items-center mb-2">
                                 <i class="bi bi-exclamation-triangle text-warning me-2"></i>
-                                <strong>Kunci Enkripsi:</strong>
+                                <strong>Password AES:</strong>
                             </div>
                             <div class="input-group mb-2">
-                                <input type="text" class="form-control" value="{{ key }}" id="encryption_key" readonly>
-                                <button class="btn btn-warning" type="button" id="copyKeyBtn">
+                                <input type="text" class="form-control" value="{{ aes_password }}" id="aes_password" readonly>
+                                <button class="btn btn-warning" type="button" id="copyAesBtn">
                                     <i class="bi bi-clipboard"></i> Salin
                                 </button>
                             </div>
-                            <div class="text-danger"><strong>PENTING!</strong> Simpan kunci ini. Dibutuhkan untuk dekripsi.</div>
+                            <div class="text-danger"><strong>PENTING!</strong> Simpan password AES ini. Dibutuhkan untuk dekripsi.</div>
+                        </div>
+                        
+                        <div class="data-card mt-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                                <strong>Password Urutan Chord:</strong>
+                            </div>
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control bg-dark text-warning fw-bold" 
+                                    value="{{ chord_positions }}" id="chord_positions" readonly>
+                                <button class="btn btn-warning" type="button" id="copyChordBtn">
+                                    <i class="bi bi-clipboard"></i> Salin
+                                </button>
+                            </div>
+                            <div class="text-danger"><strong>PENTING!</strong> Simpan password urutan chord ini. Dibutuhkan untuk dekripsi.</div>
                         </div>
                         
                         <!-- <div class="data-card mt-3">
@@ -147,8 +162,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Panggil fungsi untuk kedua tombol
-    handleCopy('copyBtn', 'chord_positions');
-    handleCopy('copyKeyBtn', 'encryption_key');
+    handleCopy('copyAesBtn', 'aes_password');
+    handleCopy('copyChordBtn', 'chord_positions');
 });
 </script>
 {% endblock %} 

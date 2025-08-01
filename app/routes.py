@@ -46,19 +46,20 @@ def encrypt():
             ciphertext_hex = encrypt_aes(plaintext, key)
             
             # Buat audio steganografi dan dapatkan chord positions
-            output_filename, decryption_key = binary_to_audio(ciphertext_hex, 
+            output_filename, decryption_key = binary_to_audio(ciphertext_hex, key,
                                              app.config['UPLOAD_FOLDER'], 
                                              app.config['CHORD_FOLDER'])
             
             # Log untuk debug
             logging.info(f"Enkripsi berhasil: pesan={plaintext}, kunci={key}, file={output_filename}")
-            logging.info(f"Chord positions disimpan dalam metadata file: {decryption_key['chord_positions_str']}")
+            logging.info(f"Password AES dan chord positions: {decryption_key['aes_password']}, {decryption_key['chord_positions_str']}")
             
-            # Tampilkan hasil (tanpa menampilkan chord positions ke user)
+            # Tampilkan hasil dengan kedua password
             return render_template('encrypt_result.html', 
                                   title='Hasil Enkripsi',
                                   plaintext=plaintext,
-                                  key=key,
+                                  aes_password=decryption_key['aes_password'],
+                                  chord_positions=decryption_key['chord_positions_str'],
                                   audio_file=output_filename,
                                   now=datetime.now())
                                   
@@ -101,8 +102,30 @@ def decrypt():
         file.save(filepath)
         
         try:
-            # Ekstrak hex dari file audio (posisi chord akan dibaca dari metadata file)
-            hex_string = extract_binary_from_audio(filepath)
+            # Baca metadata password AES (MD5) dari file
+            from app.utils.decrypt_utils import read_metadata_from_wav
+            import hashlib
+            
+            # Baca metadata password AES dari file
+            stored_aes_md5 = read_metadata_from_wav(filepath)
+            if not stored_aes_md5:
+                flash('File audio tidak valid atau tidak memiliki metadata password AES.', 'danger')
+                return redirect(url_for('decrypt'))
+            
+            # Validasi password AES dengan MD5
+            input_aes_md5 = hashlib.md5(key.encode()).hexdigest()
+            if stored_aes_md5 != input_aes_md5:
+                flash('Password AES tidak sesuai dengan file audio.', 'danger')
+                return redirect(url_for('decrypt'))
+            
+            # Ambil chord positions dari input user
+            chord_positions = request.form.get('chord_positions', '')
+            if not chord_positions:
+                flash('Chord positions (password kedua) harus disediakan.', 'warning')
+                return redirect(url_for('decrypt'))
+            
+            # Ekstrak hex dari file audio menggunakan chord positions
+            hex_string = extract_binary_from_audio(filepath, chord_positions)
             
             # Dekripsi hex
             decrypted_text = decrypt_aes(hex_string, key)

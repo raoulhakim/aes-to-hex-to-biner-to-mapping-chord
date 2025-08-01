@@ -410,12 +410,14 @@ def generate_music_from_prepared_song(song_pattern, chord_dir):
     except ValueError as e:
         raise ValueError(f"Error saat menggabungkan audio: {e}")
 
-def write_metadata_to_wav(wav_path, chord_positions):
-    """Menambahkan metadata chord positions ke file WAV."""
+def write_metadata_to_wav(wav_path, aes_password):
+    """Menambahkan metadata password AES (MD5) ke file WAV."""
     logger.info("\n" + "="*50)
     logger.info(f"[WRITE_METADATA] Menambahkan metadata ke file: {wav_path}")
     
     try:
+        import hashlib
+        
         # Buka file WAV untuk menulis metadata
         with wave.open(wav_path, 'rb') as wav_read:
             # Baca parameter dari file asli
@@ -426,11 +428,11 @@ def write_metadata_to_wav(wav_path, chord_positions):
         with wave.open(wav_path, 'wb') as wav_write:
             wav_write.setparams(params)
             
-            # Tulis metadata untuk chord positions
-            metadata_key = "CHORD_POSITIONS"
-            metadata_value = ",".join(map(str, chord_positions))
+            # Hash password AES dengan MD5
+            aes_password_md5 = hashlib.md5(aes_password.encode()).hexdigest()
+            metadata_key = "MD5"
+            metadata_value = aes_password_md5
             
-            # Menambahkan metadata dalam format LIST INFO
             # Gunakan bytes langsung untuk menghindari masalah encoding
             list_header = b"LIST"
             info_header = b"INFO"
@@ -463,7 +465,7 @@ def write_metadata_to_wav(wav_path, chord_positions):
         logger.error(f"[WRITE_METADATA] Error saat menulis metadata: {str(e)}")
         return False
 
-def binary_to_audio(hex_string, output_dir="app/static/uploads", chord_dir="Chord"):
+def binary_to_audio(hex_string, aes_password, output_dir="app/static/uploads", chord_dir="Chord"):
     """Fungsi utama untuk konversi hex ke audio steganografi."""
     logger.info("\n" + "="*50)
     logger.info("[BINARY_TO_AUDIO] Memulai konversi hex ke audio steganografi")
@@ -497,12 +499,13 @@ def binary_to_audio(hex_string, output_dir="app/static/uploads", chord_dir="Chor
     wavfile.write(output_path, sample_rate, audio_data)
     logger.info(f"[BINARY_TO_AUDIO] Audio berhasil disimpan ke: {output_path}")
     
-    # Tambahkan metadata chord positions ke file WAV
-    write_metadata_to_wav(output_path, chord_positions)
-    logger.info(f"[BINARY_TO_AUDIO] Metadata chord positions berhasil ditambahkan ke file WAV")
+    # Tambahkan metadata password AES (MD5) ke file WAV
+    write_metadata_to_wav(output_path, aes_password)
+    logger.info(f"[BINARY_TO_AUDIO] Metadata password AES (MD5) berhasil ditambahkan ke file WAV")
     
     # Format kunci dekripsi yang dikembalikan ke routes.py
     decryption_key = {
+        "aes_password": aes_password,
         "chord_positions": chord_positions,
         "chord_positions_str": ",".join(map(str, chord_positions))
     }
@@ -516,8 +519,8 @@ def binary_to_audio(hex_string, output_dir="app/static/uploads", chord_dir="Chor
     logger.info(f"[BINARY_TO_AUDIO] Nama file output: {output_filename}")
     logger.info("[BINARY_TO_AUDIO] Proses konversi hex ke audio steganografi selesai")
     logger.info(f"[BINARY_TO_AUDIO] Lagu Mary Had a Little Lamb diulang sebanyak {perulangan_count} kali")
-    logger.info(f"[BINARY_TO_AUDIO] PENTING: Password kedua (posisi chord) disimpan dalam metadata file WAV")
-    logger.info("[BINARY_TO_AUDIO] Pengguna tidak perlu menyimpan posisi chord secara manual")
+    logger.info(f"[BINARY_TO_AUDIO] PENTING: Password AES (MD5) disimpan dalam metadata file WAV")
+    logger.info("[BINARY_TO_AUDIO] Pengguna perlu menyimpan password AES dan chord positions secara manual")
     logger.info("="*50 + "\n")
     
     return output_filename, decryption_key 
