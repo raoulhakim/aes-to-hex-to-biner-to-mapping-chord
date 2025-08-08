@@ -240,6 +240,22 @@ body {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0, 0, 0, 0.55)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
 }
 
+/* Hover effect untuk nav-link */
+.navbar-light .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: var(--primary-color) !important;
+    transform: translateY(-1px);
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+/* Active state untuk nav-link */
+.navbar-light .navbar-nav .nav-link.active,
+.navbar-dark .navbar-nav .nav-link.active {
+    color: var(--primary-color) !important;
+    font-weight: 600;
+    border-bottom: 2px solid var(--primary-color);
+}
+
 /* Gradient Text */
 .gradient-text {
     background: var(--primary-gradient);

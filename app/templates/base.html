@@ -46,9 +46,9 @@
                 
                 <div class="d-flex align-items-center">
                     <!-- Log Menu -->
-                    <a class="nav-link me-3 {% if request.endpoint == 'view_logs' %}active{% endif %}" href="{{ url_for('view_logs') }}">
+                    <!-- <a class="nav-link me-3 {% if request.endpoint == 'view_logs' %}active{% endif %}" href="{{ url_for('view_logs') }}">
                         <i class="bi bi-file-text me-1"></i> Log
-                    </a>
+                    </a> -->
                     
                     <!-- Theme Switcher -->
                     <div class="theme-switch-wrapper">
@@ -126,7 +126,9 @@
             const currentTheme = localStorage.getItem('theme');
             
             // Atur tema berdasarkan localStorage atau defaultnya light
+            // Jika belum ada tema yang disimpan, default ke light mode
             setTheme(currentTheme === 'dark');
+            themeToggle.checked = currentTheme === 'dark';
             
             // Event listener untuk toggle switch
             themeToggle.addEventListener('change', function(e) {

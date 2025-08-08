@@ -1,4 +1,5 @@
 import os
+import time
 from flask import render_template, flash, redirect, url_for, request, send_file, send_from_directory
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -42,6 +43,9 @@ def encrypt():
             return redirect(url_for('encrypt'))
             
         try:
+            # Mulai timing untuk proses enkripsi
+            start_time = time.time()
+            
             # Enkripsi pesan
             ciphertext_hex = encrypt_aes(plaintext, key)
             
@@ -50,9 +54,16 @@ def encrypt():
                                              app.config['UPLOAD_FOLDER'], 
                                              app.config['CHORD_FOLDER'])
             
-            # Log untuk debug
+            # Hitung waktu eksekusi
+            end_time = time.time()
+            execution_time = end_time - start_time
+            seconds = int(execution_time)
+            milliseconds = int((execution_time - seconds) * 1000)
+            
+            # Log untuk debug dengan timing
             logging.info(f"Enkripsi berhasil: pesan={plaintext}, kunci={key}, file={output_filename}")
             logging.info(f"Password AES dan chord positions: {decryption_key['aes_password']}, {decryption_key['chord_positions_str']}")
+            logging.info(f"Waktu eksekusi enkripsi: {seconds}.{milliseconds:03d} detik")
             
             # Tampilkan hasil dengan kedua password
             return render_template('encrypt_result.html', 
@@ -102,6 +113,9 @@ def decrypt():
         file.save(filepath)
         
         try:
+            # Mulai timing untuk proses dekripsi
+            start_time = time.time()
+            
             # Baca metadata password AES (MD5) dari file
             from app.utils.decrypt_utils import read_metadata_from_wav
             import hashlib
@@ -130,8 +144,15 @@ def decrypt():
             # Dekripsi hex
             decrypted_text = decrypt_aes(hex_string, key)
             
-            # Log untuk debug
+            # Hitung waktu eksekusi
+            end_time = time.time()
+            execution_time = end_time - start_time
+            seconds = int(execution_time)
+            milliseconds = int((execution_time - seconds) * 1000)
+            
+            # Log untuk debug dengan timing
             logging.info(f"Dekripsi berhasil: file={filename}, kunci={key}")
+            logging.info(f"Waktu eksekusi dekripsi: {seconds}.{milliseconds:03d} detik")
             
             # Tampilkan hasil
             return render_template('decrypt_result.html',
