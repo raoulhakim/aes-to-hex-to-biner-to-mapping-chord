@@ -257,9 +257,9 @@ def prepare_song_with_binary(binary_string):
         current_segment_index += 1
         
         # Keamanan agar tidak loop tanpa akhir
-        if iteration > 100:
-            logger.error("[PREPARE_SONG] Terlalu banyak perulangan, menghentikan proses.")
-            break
+        # if iteration > 100:
+        #     logger.error("[PREPARE_SONG] Terlalu banyak perulangan, menghentikan proses.")
+        #     break
     
     logger.info(f"[PREPARE_SONG] Pola lagu selesai dibuat dengan {len(song_pattern)} nada")
     logger.info(f"[PREPARE_SONG] Lagu diulang sebanyak {iteration} kali")
@@ -283,6 +283,8 @@ def generate_music_from_prepared_song(song_pattern, chord_dir):
     audio_segments = []
     note_positions = [0]
     position = 0
+    # Cache chord agar tidak berulang kali membaca dari disk
+    chord_cache = {}
     
     # Debug: Tampilkan pola lagu yang akan diproses
     logger.info("[GENERATE_MUSIC] Pola lagu yang akan diproses:")
@@ -363,15 +365,20 @@ def generate_music_from_prepared_song(song_pattern, chord_dir):
                 continue
         
         try:
-            # Baca file chord
-            rate, audio = wavfile.read(chord_path)
-            
-            # Konversi stereo ke mono jika diperlukan
-            if len(audio.shape) > 1:  # Jika stereo
-                audio = np.mean(audio, axis=1).astype(np.int16)  # Konversi ke mono dengan mengambil rata-rata
-                logger.info(f"[GENERATE_MUSIC] Mengkonversi audio stereo ke mono untuk {chord_filename}")
-            
-            logger.info(f"[GENERATE_MUSIC] Membaca chord: {chord_filename} (rate={rate}Hz, panjang={len(audio)})")
+            # Lazy loading + caching chord untuk hemat I/O dan memori
+            if chord_filename in chord_cache:
+                rate, base_audio = chord_cache[chord_filename]
+            else:
+                rate, base_audio = wavfile.read(chord_path)
+                if len(base_audio.shape) > 1:  # Jika stereo, konversi ke mono
+                    base_audio = np.mean(base_audio, axis=1).astype(np.int16)
+                    logger.info(f"[GENERATE_MUSIC] Mengkonversi audio stereo ke mono untuk {chord_filename}")
+                else:
+                    base_audio = base_audio.astype(np.int16)
+                chord_cache[chord_filename] = (rate, base_audio)
+
+            audio = base_audio
+            logger.info(f"[GENERATE_MUSIC] Menggunakan chord: {chord_filename} (rate={rate}Hz, panjang={len(audio)})")
             
             # Hitung durasi berdasarkan ketukan (1.0 = 0.5 detik)
             beat_duration = int(sample_rate * 0.5 * duration)
