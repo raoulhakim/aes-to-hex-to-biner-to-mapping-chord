@@ -34,25 +34,39 @@ def calculate_pearson_correlation(text1, text2):
     return correlation
 
 def text_to_binary(text):
-    """Mengubah teks ke representasi biner."""
-    return ''.join(format(ord(c), '08b') for c in text)
+    """Mengubah teks ke representasi biner berbasis byte (UTF-8)."""
+    byte_data = text.encode('utf-8')
+    return ''.join(format(b, '08b') for b in byte_data)
+
+def hex_to_binary(hex_string):
+    """Mengubah ciphertext hex ke representasi biner berbasis byte."""
+    try:
+        byte_data = binascii.unhexlify(hex_string)
+    except binascii.Error:
+        return ''
+    return ''.join(format(b, '08b') for b in byte_data)
 
 def summarize_binary(binary_string):
-    """Meringkas string biner dengan mengambil bagian awal dan akhir."""
-    first_part = binary_string[:80]  # 10 karakter x 8 bit
-    last_part = binary_string[-40:]  # 5 karakter x 8 bit
-    return f"{first_part}...{last_part}"
+    n = len(binary_string)
+    if n <= 80:
+        return binary_string
+    first_part = binary_string[:9999999]
+    # last_part = binary_string[-40:]
+    return f"{first_part}"
 
-def calculate_binary_pearson(text1, text2):
-    """Menghitung korelasi Pearson berdasarkan representasi biner."""
-    bin1 = [int(b) for b in text_to_binary(text1)]
-    bin2 = [int(b) for b in text_to_binary(text2)]
-    
-    min_len = min(len(bin1), len(bin2))
-    bin1 = bin1[:min_len]
-    bin2 = bin2[:min_len]
-    
-    correlation, _ = pearsonr(bin1, bin2)
+def calculate_binary_pearson(plaintext_text, ciphertext_hex):
+    """Menghitung korelasi Pearson antara biner plaintext dan biner AES ciphertext (bytes)."""
+    bin_plain = [int(b) for b in text_to_binary(plaintext_text)]
+    bin_cipher = [int(b) for b in hex_to_binary(ciphertext_hex)]
+
+    if not bin_plain or not bin_cipher:
+        raise ValueError("Representasi biner kosong. Periksa input plaintext atau ciphertext hex.")
+
+    min_len = min(len(bin_plain), len(bin_cipher))
+    bin_plain = bin_plain[:min_len]
+    bin_cipher = bin_cipher[:min_len]
+
+    correlation, _ = pearsonr(bin_plain, bin_cipher)
     return correlation
 
 def encrypt_text_with_aes(plaintext, key):
@@ -112,34 +126,24 @@ def test_correlation(messages, passwords):
         # Verifikasi dengan enkripsi manual
         manual_base64, manual_hex = manual_encrypt_aes(message, password)
         
-        print(f"Ciphertext (Base64): {ciphertext_base64}")
-        print(f"Ciphertext (Hex): {ciphertext_hex[:30]}...")
+        # print(f"Ciphertext (Base64): {ciphertext_base64}")
+        # print(f"Ciphertext (Hex): {ciphertext_hex[:30]}...")
         
-        # Hitung korelasi ASCII menggunakan representasi Base64
-        print("\nKorelasi ASCII (menggunakan Base64):")
+        # Hitung korelasi Biner antara plaintext dan AES ciphertext (bytes)
+        print("\nKorelasi Biner (Plaintext vs AES Biner):")
         try:
-            # Gunakan string Base64 langsung untuk perbandingan
-            ascii_correlation = calculate_pearson_correlation(message, ciphertext_base64)
-            print(f"Korelasi Pearson (ASCII dengan Base64): {ascii_correlation:.6f}")
-        except Exception as e:
-            print(f"Error pada perhitungan korelasi ASCII: {str(e)}")
-            ascii_correlation = None
-        
-        # Hitung korelasi Biner menggunakan representasi biner langsung
-        print("\nKorelasi Biner:")
-        try:
-            # Representasi biner dari plaintext
+            # Representasi biner dari plaintext (berbasis byte)
             plaintext_binary = text_to_binary(message)
-            
-            # Representasi biner dari Base64 ciphertext
-            base64_binary = text_to_binary(ciphertext_base64)
-            
+
+            # Representasi biner dari ciphertext AES (dari bytes, sumber: hex)
+            aes_binary = hex_to_binary(ciphertext_hex)
+
             print(f"Plaintext (binary): {summarize_binary(plaintext_binary)}")
-            print(f"Base64 Ciphertext (binary): {summarize_binary(base64_binary)}")
-            
-            # Hitung korelasi antara representasi biner plaintext dan Base64 ciphertext
-            binary_correlation = calculate_binary_pearson(message, ciphertext_base64)
-            print(f"Korelasi Pearson (Biner dengan Base64): {binary_correlation:.6f}")
+            print(f"AES Ciphertext (binary): {summarize_binary(aes_binary)}")
+
+            # Korelasi Pearson antara dua deret biner
+            binary_correlation = calculate_binary_pearson(message, ciphertext_hex)
+            print(f"Korelasi Pearson (Biner): {binary_correlation:.6f}")
         except Exception as e:
             print(f"Error pada perhitungan korelasi Biner: {str(e)}")
             binary_correlation = None
@@ -150,7 +154,6 @@ def test_correlation(messages, passwords):
             'password': password,
             'ciphertext_base64': ciphertext_base64,
             'ciphertext_hex': ciphertext_hex,
-            'ascii_correlation': ascii_correlation,
             'binary_correlation': binary_correlation
         })
         
@@ -160,18 +163,16 @@ def test_correlation(messages, passwords):
     print("\n" + "="*80)
     print("RINGKASAN HASIL KORELASI PEARSON".center(80))
     print("="*80)
-    print(f"{'#':<3} {'Panjang':<10} {'ASCII Correlation':<20} {'Binary Correlation':<20}")
+    print(f"{'#':<3} {'Panjang':<10} {'Binary Correlation':<20}")
     print("-"*80)
     
     for i, result in enumerate(results):
         msg_len = len(result['message'])
-        ascii_corr = result['ascii_correlation']
         binary_corr = result['binary_correlation']
         
-        ascii_str = f"{ascii_corr:.6f}" if ascii_corr is not None else "N/A"
         binary_str = f"{binary_corr:.6f}" if binary_corr is not None else "N/A"
         
-        print(f"{i+1:<3} {msg_len:<10} {ascii_str:<20} {binary_str:<20}")
+        print(f"{i+1:<3} {msg_len:<10} {binary_str:<20}")
     
     print("="*80)
     
@@ -205,19 +206,23 @@ def main():
     else:
         # Gunakan preset untuk pengujian
         messages = [
-            "Hai",                                                                    # 3 karakter
-            "Sampai jumpa besok",                                                     # 16 karakter
-            "Terima kasih atas bantuannya kemarin",                                   # 30 karakter
-            "Saya sedang mengerjakan tugas kuliah tentang steganografi audio dan enkripsi data",  # 75 karakter
-            "Akhir pekan ini saya berencana mengunjungi pantai di Bali. Cuacanya diperkirakan cerah dengan sedikit awan. Kita bisa menikmati matahari terbenam sambil makan malam."  # 150 karakter
+            "iaH",
+            "Hai123",
+            "TestPassword1234",
+            "4321drowssaPtseT",
+            "5",                    # 3 karakter
+            # "Sampai jumpa besok",                                                     # 16 karakter
+            # "Terima kasih atas bantuannya kemarin",                                   # 30 karakter
+            # "Saya sedang mengerjakan tugas kuliah tentang steganografi audio dan enkripsi data",  # 75 karakter
+            # "Akhir pekan ini saya berencana mengunjungi pantai di Bali. Cuacanya diperkirakan cerah dengan sedikit awan. Kita bisa menikmati matahari terbenam sambil makan malam."  # 150 karakter
         ]
         
         passwords = [
             "TestPassword1234",
-            "Stegano123Audio4",
-            "AudioSecret12345",
-            "Sec#Audio@123456",
-            "PesanRahasia2023"
+            "TestPassword1234",
+            "TestPassword1234",
+            "TestPassword1234",
+            "5555555555555555"
         ]
     
     # Jalankan pengujian
