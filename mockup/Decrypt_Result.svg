@@ -1,0 +1,52 @@
+<svg width="1440" height="1024" viewBox="0 0 1440 1024" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="1024" fill="#ffffff"/>
+  <rect x="0" y="0" width="1440" height="64" fill="#f8f9fa"/>
+  <text x="160" y="44" font-family="Inter" font-size="14" fill="#0F172A">Hasil Dekripsi</text>
+
+  <g transform="translate(160,96)">
+    <rect width="1120" height="760" rx="12" fill="#ffffff" stroke="#E2E8F0"/>
+    <rect x="0" y="0" width="1120" height="56" rx="12" fill="#f1f5f9"/>
+    <text x="16" y="36" font-family="Inter" font-size="14" font-weight="600" fill="#0F172A">Hasil Dekripsi</text>
+
+    <g transform="translate(24,72)">
+      <rect width="1072" height="80" rx="8" fill="#d1e7dd" stroke="#badbcc"/>
+      <text x="16" y="48" font-family="Inter" font-weight="600" font-size="14" fill="#0F172A">Berhasil! Pesan telah didekripsi.</text>
+    </g>
+
+    <g transform="translate(24,168)">
+      <!-- Left card -->
+      <rect width="520" height="360" rx="12" fill="#ffffff" stroke="#E2E8F0"/>
+      <rect x="0" y="0" width="520" height="48" rx="12" fill="#f1f5f9"/>
+      <text x="16" y="30" font-family="Inter" font-size="14" font-weight="600" fill="#0F172A">Detail Dekripsi</text>
+
+      <text x="16" y="80" font-family="Inter" font-size="12" fill="#0F172A">Pesan Asli:</text>
+      <rect x="16" y="92" width="488" height="64" rx="8" fill="#f8f9fa" stroke="#E2E8F0"/>
+      <text x="16" y="170" font-family="Inter" font-size="12" fill="#64748B">Jumlah karakter: 123</text>
+
+      <text x="16" y="210" font-family="Inter" font-size="12" fill="#0F172A">Waktu Dekripsi:</text>
+      <rect x="16" y="222" width="260" height="40" rx="8" fill="#f8f9fa" stroke="#E2E8F0"/>
+    </g>
+
+    <g transform="translate(576,168)">
+      <!-- Right card -->
+      <rect width="520" height="360" rx="12" fill="#ffffff" stroke="#E2E8F0"/>
+      <rect x="0" y="0" width="520" height="48" rx="12" fill="#f1f5f9"/>
+      <text x="16" y="30" font-family="Inter" font-size="14" font-weight="600" fill="#0F172A">Informasi Kunci</text>
+
+      <text x="16" y="80" font-family="Inter" font-size="12" fill="#0F172A">Kunci Dekripsi:</text>
+      <rect x="16" y="92" width="360" height="40" rx="8" fill="#ffffff" stroke="#CBD5E1"/>
+
+      <g transform="translate(16,150)">
+        <rect width="488" height="70" rx="8" fill="#cff4fc" stroke="#b6effb"/>
+        <text x="12" y="42" font-family="Inter" font-size="12" fill="#055160">Metadata chord positions otomatis dibaca dari file audio.</text>
+      </g>
+    </g>
+
+    <g transform="translate(24,560)">
+      <rect width="160" height="36" rx="6" fill="#0d6efd"/><text x="16" y="24" font-family="Inter" font-size="12" fill="#fff">Dekripsi File Lain</text>
+      <g transform="translate(180,0)">
+        <rect width="180" height="36" rx="6" fill="#ffffff" stroke="#ced4da"/><text x="16" y="24" font-family="Inter" font-size="12" fill="#0F172A">Kembali ke Beranda</text>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,81 @@
+<svg width="1440" height="1400" viewBox="0 0 1440 1400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="1400" fill="#ffffff"/>
+  <rect x="0" y="0" width="1440" height="64" fill="#f8f9fa"/>
+  <text x="160" y="44" font-family="Inter" font-size="14" fill="#0F172A">Tentang Aplikasi</text>
+
+  <!-- Hero -->
+  <g transform="translate(160,96)">
+    <text x="0" y="0" font-family="Inter" font-weight="700" font-size="32" fill="#0F172A">Tentang Aplikasi</text>
+  </g>
+
+  <!-- Intro card -->
+  <g transform="translate(160,140)">
+    <rect width="1120" height="180" rx="12" fill="#ffffff" stroke="#E2E8F0"/>
+    <text x="16" y="40" font-family="Inter" font-size="20" fill="#0F172A">Noiseless Steganografi Audio dengan Enkripsi AES</text>
+    <text x="16" y="76" font-family="Inter" font-size="14" fill="#475569">Steganografi adalah ... dikombinasikan dengan enkripsi AES ...</text>
+  </g>
+
+  <!-- Two columns -->
+  <g transform="translate(160,340)">
+    <g>
+      <rect width="540" height="300" rx="12" fill="#ffffff" stroke="#E2E8F0"/>
+      <text x="16" y="40" font-family="Inter" font-size="20" fill="#0F172A">Apa itu Steganografi?</text>
+      <text x="16" y="76" font-family="Inter" font-size="14" fill="#475569">Steganografi adalah seni ...</text>
+      <text x="16" y="120" font-family="Inter" font-size="14" fill="#475569">Dalam aplikasi ini ... Mary Had a Little Lamb ...</text>
+    </g>
+    <g transform="translate(580,0)">
+      <rect width="540" height="300" rx="12" fill="#ffffff" stroke="#E2E8F0"/>
+      <text x="16" y="40" font-family="Inter" font-size="20" fill="#0F172A">Enkripsi AES</text>
+      <text x="16" y="76" font-family="Inter" font-size="14" fill="#475569">AES-128, mode ECB, padding PKCS#7 ...</text>
+      <g transform="translate(16,120)">
+        <text x="0" y="0" font-family="Inter" font-size="14" fill="#475569">• Kunci 16 karakter (128 bit)</text>
+        <text x="0" y="24" font-family="Inter" font-size="14" fill="#475569">• Mode ECB</text>
+        <text x="0" y="48" font-family="Inter" font-size="14" fill="#475569">• Padding PKCS#7</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- Table mapping -->
+  <g transform="translate(160,660)">
+    <rect width="1120" height="340" rx="12" fill="#ffffff" stroke="#E2E8F0"/>
+    <text x="16" y="40" font-family="Inter" font-size="20" fill="#0F172A">Cara Kerja Steganografi Audio</text>
+    <text x="16" y="72" font-family="Inter" font-size="14" fill="#475569">Setiap 2-bit dipetakan ke chord:</text>
+    <g transform="translate(160,100)">
+      <rect width="800" height="44" fill="#cfe2ff"/>
+      <text x="40" y="28" font-family="Inter" font-weight="600" font-size="14" fill="#0F172A">Segmen Biner</text>
+      <text x="480" y="28" font-family="Inter" font-weight="600" font-size="14" fill="#0F172A">Chord Musik</text>
+      <g transform="translate(0,44)">
+        <rect width="800" height="44" fill="#ffffff" stroke="#E2E8F0"/>
+        <text x="40" y="28" font-family="Inter" font-size="14" fill="#0F172A">00</text>
+        <text x="480" y="28" font-family="Inter" font-size="14" fill="#0F172A">Chord C</text>
+      </g>
+      <g transform="translate(0,88)">
+        <rect width="800" height="44" fill="#ffffff" stroke="#E2E8F0"/>
+        <text x="40" y="28" font-family="Inter" font-size="14" fill="#0F172A">01</text>
+        <text x="480" y="28" font-family="Inter" font-size="14" fill="#0F172A">Chord D</text>
+      </g>
+      <g transform="translate(0,132)">
+        <rect width="800" height="44" fill="#ffffff" stroke="#E2E8F0"/>
+        <text x="40" y="28" font-family="Inter" font-size="14" fill="#0F172A">10</text>
+        <text x="480" y="28" font-family="Inter" font-size="14" fill="#0F172A">Chord E</text>
+      </g>
+      <g transform="translate(0,176)">
+        <rect width="800" height="44" fill="#ffffff" stroke="#E2E8F0"/>
+        <text x="40" y="28" font-family="Inter" font-size="14" fill="#0F172A">11</text>
+        <text x="480" y="28" font-family="Inter" font-size="14" fill="#0F172A">Chord G</text>
+      </g>
+    </g>
+    <text x="16" y="320" font-family="Inter" font-size="14" fill="#475569">Nada-nada disusun mengikuti pola Mary Had a Little Lamb ...</text>
+  </g>
+
+  <!-- Teknologi -->
+  <g transform="translate(160,1020)">
+    <rect width="1120" height="260" rx="12" fill="#ffffff" stroke="#E2E8F0"/>
+    <text x="16" y="40" font-family="Inter" font-size="20" fill="#0F172A">Teknologi yang Digunakan</text>
+    <g transform="translate(16,70)">
+      <text x="0" y="0" font-family="Inter" font-size="14" fill="#475569">• Python, Flask, Pycryptodome</text>
+      <text x="360" y="0" font-family="Inter" font-size="14" fill="#475569">• SciPy, Bootstrap 5, JS</text>
+      <text x="720" y="0" font-family="Inter" font-size="14" fill="#475569">• Numpy, WAV, HTML5 Audio</text>
+    </g>
+  </g>
+</svg>

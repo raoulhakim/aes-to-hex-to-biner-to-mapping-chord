@@ -1,0 +1,54 @@
+<svg width="1440" height="1024" viewBox="0 0 1440 1024" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="1024" fill="#ffffff"/>
+  <rect x="0" y="0" width="1440" height="64" fill="#f8f9fa"/>
+  <text x="160" y="44" font-family="Inter" font-size="14" fill="#0F172A">Enkripsi</text>
+
+  <g transform="translate(160,96)">
+    <rect width="1120" height="760" rx="12" fill="#ffffff" stroke="#E2E8F0"/>
+    <rect x="0" y="0" width="1120" height="56" rx="12" fill="#f1f5f9"/>
+    <text x="16" y="36" font-family="Inter" font-size="14" font-weight="600" fill="#0F172A">Enkripsi Pesan</text>
+
+    <!-- Info badge -->
+    <text x="1040" y="36" font-family="Inter" font-size="12" fill="#0F172A">AES-128</text>
+
+    <!-- Progress (hidden default visual) -->
+    <g transform="translate(24,80)">
+      <text x="0" y="0" font-family="Inter" font-size="16" fill="#0F172A">Proses Enkripsi</text>
+      <rect x="0" y="16" width="1072" height="8" rx="4" fill="#E2E8F0"/>
+      <rect x="0" y="16" width="180" height="8" rx="4" fill="#0d6efd"/>
+      <text x="1040" y="42" font-family="Inter" font-size="12" fill="#64748B">00:12</text>
+      <text x="0" y="42" font-family="Inter" font-size="12" fill="#64748B">35%</text>
+      <text x="480" y="42" font-family="Inter" font-size="12" fill="#64748B">Mengenkripsi pesan dengan kunci Anda...</text>
+    </g>
+
+    <!-- Form -->
+    <g transform="translate(24,160)">
+      <!-- Left column -->
+      <text x="0" y="0" font-family="Inter" font-size="14" fill="#0F172A">Pesan</text>
+      <rect x="0" y="12" width="720" height="180" rx="8" fill="#ffffff" stroke="#CBD5E1"/>
+      <text x="0" y="212" font-family="Inter" font-size="12" fill="#64748B">Masukkan pesan yang ingin dienkripsi</text>
+      <text x="620" y="212" font-family="Inter" font-size="12" fill="#64748B">0 karakter</text>
+
+      <!-- Right column -->
+      <g transform="translate(744,0)">
+        <text x="0" y="0" font-family="Inter" font-size="14" fill="#0F172A">Kunci Enkripsi</text>
+        <rect x="0" y="12" width="352" height="44" rx="8" fill="#ffffff" stroke="#CBD5E1"/>
+        <text x="12" y="40" font-family="Inter" font-size="12" fill="#64748B">16 karakter</text>
+        <g transform="translate(0,72)">
+          <rect width="352" height="56" rx="8" fill="#cff4fc" stroke="#b6effb"/>
+          <text x="12" y="34" font-family="Inter" font-size="12" fill="#055160">Ingat kunci yang digunakan. Diperlukan untuk dekripsi.</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- Actions -->
+    <g transform="translate(24,360)">
+      <rect width="120" height="36" rx="6" fill="#ffffff" stroke="#ced4da"/>
+      <text x="16" y="24" font-family="Inter" font-size="12" fill="#0F172A">Kembali</text>
+      <g transform="translate(136,0)">
+        <rect width="140" height="36" rx="6" fill="#0d6efd"/>
+        <text x="16" y="24" font-family="Inter" font-size="12" fill="#ffffff">Enkripsi</text>
+      </g>
+    </g>
+  </g>
+</svg>

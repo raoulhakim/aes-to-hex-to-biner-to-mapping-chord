@@ -1,0 +1,41 @@
+<svg width="1440" height="1024" viewBox="0 0 1440 1024" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="1024" fill="#ffffff"/>
+  <rect x="0" y="0" width="1440" height="64" fill="#f8f9fa"/>
+  <text x="160" y="44" font-family="Inter" font-size="14" fill="#0F172A">Dekripsi</text>
+
+  <g transform="translate(160,96)">
+    <rect width="1120" height="760" rx="12" fill="#ffffff" stroke="#E2E8F0"/>
+    <rect x="0" y="0" width="1120" height="56" rx="12" fill="#f1f5f9"/>
+    <text x="16" y="36" font-family="Inter" font-size="14" font-weight="600" fill="#0F172A">Dekripsi Audio Steganografi</text>
+
+    <!-- Alert info -->
+    <g transform="translate(24,72)">
+      <rect width="1072" height="92" rx="8" fill="#cff4fc" stroke="#b6effb"/>
+      <text x="16" y="30" font-family="Inter" font-weight="600" font-size="14" fill="#0F172A">Instruksi:</text>
+      <text x="16" y="58" font-family="Inter" font-size="12" fill="#055160">Upload file WAV, masukkan password AES (16), dan urutan chord.</text>
+    </g>
+
+    <!-- Form -->
+    <g transform="translate(24,184)">
+      <text x="0" y="0" font-family="Inter" font-size="14" fill="#0F172A">File Audio (.wav)</text>
+      <rect x="0" y="12" width="360" height="44" rx="8" fill="#ffffff" stroke="#CBD5E1"/>
+      <text x="12" y="40" font-family="Inter" font-size="12" fill="#64748B">Pilih file...</text>
+
+      <text x="0" y="92" font-family="Inter" font-size="14" fill="#0F172A">Password AES</text>
+      <rect x="0" y="104" width="360" height="44" rx="8" fill="#ffffff" stroke="#CBD5E1"/>
+
+      <text x="0" y="184" font-family="Inter" font-size="14" fill="#0F172A">Password Urutan Chord</text>
+      <rect x="0" y="196" width="520" height="44" rx="8" fill="#ffffff" stroke="#CBD5E1"/>
+      <text x="12" y="224" font-family="Inter" font-size="12" fill="#64748B">Contoh: 1,2,3,4,5</text>
+
+      <g transform="translate(0,260)">
+        <rect width="140" height="40" rx="6" fill="#0d6efd"/>
+        <text x="16" y="26" font-family="Inter" font-size="12" fill="#ffffff">Dekripsi Pesan</text>
+      </g>
+      <g transform="translate(980,260)">
+        <rect width="120" height="40" rx="6" fill="#ffffff" stroke="#ced4da"/>
+        <text x="16" y="26" font-family="Inter" font-size="12" fill="#0F172A">Kembali</text>
+      </g>
+    </g>
+  </g>
+</svg>
