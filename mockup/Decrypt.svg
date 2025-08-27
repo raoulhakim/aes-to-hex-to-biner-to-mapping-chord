@@ -32,7 +32,7 @@
         <rect width="140" height="40" rx="6" fill="#0d6efd"/>
         <text x="16" y="26" font-family="Inter" font-size="12" fill="#ffffff">Dekripsi Pesan</text>
       </g>
-      <g transform="translate(980,260)">
+      <g transform="translate(940,260)">
         <rect width="120" height="40" rx="6" fill="#ffffff" stroke="#ced4da"/>
         <text x="16" y="26" font-family="Inter" font-size="12" fill="#0F172A">Kembali</text>
       </g>
