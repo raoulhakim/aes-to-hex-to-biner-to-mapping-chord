@@ -158,13 +158,13 @@ def decrypt_aes(ciphertext_hex, key, expected_key_length=16):
             # Validasi padding - jika padding tidak valid, kemungkinan password salah
             if padding_length > 16 or padding_length < 1:
                 logger.error(f"[DECRYPT_AES] ERROR: Padding tidak valid (nilai: {padding_length})")
-                raise ValueError("Password salah atau chord positions tidak sesuai. Padding tidak valid.")
+                raise ValueError("Password salah atau chord positions tidak sesuai.")
             
             # Cek padding konsistensi
             for i in range(1, padding_length + 1):
                 if decrypted_padded[-i] != padding_length:
                     logger.error(f"[DECRYPT_AES] ERROR: Padding tidak konsisten pada posisi -{i}")
-                    raise ValueError("Password salah atau chord positions tidak sesuai. Padding tidak konsisten.")
+                    raise ValueError("Password salah atau chord positions tidak sesuai.")
                 
             # Hapus padding
             decrypted = decrypted_padded[:-padding_length]
@@ -244,9 +244,9 @@ def extract_binary_from_exact_positions(chord_positions):
             logger.info(f"[EXTRACT_BINARY] Jika ada perulangan berikutnya, akan dimulai dari chord_idx {position_counter}")
             
             # Debug jika diperlukan
-            if position_counter > max_pos + 100:  # Prevent infinite loops
-                logger.error(f"[EXTRACT_BINARY] ERROR: Kemungkinan infinite loop pada rekonstruksi pola lagu")
-                break
+            # if position_counter > max_pos + 100:  # Prevent infinite loops
+            #     logger.error(f"[EXTRACT_BINARY] ERROR: Kemungkinan infinite loop pada rekonstruksi pola lagu")
+            #     break
         
         # Ekstrak biner dari posisi chord - MENGGUNAKAN URUTAN YANG SAMA PERSIS
         binary_segments = []
